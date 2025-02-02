@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using ServerLibrary.Data;
+using ServerLibrary.Helpers;
+using ServerLibrary.Repositories.Implementations;
+using ServerLibrary.Repositories.Interfaces;
+using ServerLibrary.Services.Implementations;
+using ServerLibrary.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,12 +15,22 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// START
 builder.Services.AddDbContext<ReadifyContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ??
         throw new InvalidOperationException("Error to connection!"));
 });
 
+builder.Services.Configure<JwtSection>(builder.Configuration.GetSection("JwtSection"));
+
+// Register repositories
+builder.Services.AddScoped<ILogRepository, LogRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Register services
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
