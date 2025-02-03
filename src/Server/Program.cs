@@ -30,6 +30,7 @@ builder.Services.AddScoped<ILogRepository, LogRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register services
+builder.Services.AddScoped<IAuthentificatonService, AuthentificatonService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
@@ -41,6 +42,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseFileServer();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

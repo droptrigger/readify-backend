@@ -2,9 +2,16 @@
 using HelpLibrary.DTOs;
 using HelpLibrary.Entities;
 using HelpLibrary.Responces;
-using Microsoft.AspNetCore.Identity;
-using ServerLibrary.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using ServerLibrary.Helpers;
 using ServerLibrary.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ServerLibrary.Services.Interfaces;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -19,54 +26,44 @@ namespace ServerLibrary.Services.Implementations
             _logRepository = logRepository;
         }
 
-        public async Task<GeneralResponce> RegisterUserAsync(Registration user)
+        public async Task<UpdateUserResponce> UpdateUserAsync(UpdateUser user)
         {
-            if (user == null) return new GeneralResponce(false, "Model is empty");
+            var updateUser = await _userRepository.FindByIdAsync(user.UserId);
+            if (updateUser is null) return new UpdateUserResponce(false);
 
-            var checkUser = await _userRepository.FindByEmailAsync(user.Email!);
-            if (checkUser != null) return new GeneralResponce(false, "The user is already registered");
-
-            checkUser = await _userRepository.FindByNicknameAsync(user.Nickname!);
-            if (checkUser != null) return new GeneralResponce(false, "The user is already registered");
-
-            var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
-
-            User addUser = await _userRepository.AddToDatabaseAsync(new User()
+            if (user.AvatarImage is not null)
             {
-                Nickname = user.Nickname!,
-                Name = user.Name,
-                Email = user.Email!,
-                PasswordHash = hashPassword,
-                CreatedAt = DateTime.UtcNow,
-            });
+                if (File.Exists(Constants.PathToUserAvatar + updateUser.AvatarImagePath) &&
+                    (Constants.PathToUserAvatar + updateUser.AvatarImagePath != Constants.DefaultAvatar))
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = addUser.Id, Action = Helpers.Constants.Register });
+                    File.Delete(Constants.PathToUserAvatar + updateUser.AvatarImagePath);
 
-            return new GeneralResponce(true, "You have successfully registered"); 
-        }
-
-        public async Task<GeneralResponce> SignInAsync(Login user)
-        {
-            if (user is null) return new GeneralResponce(false, "Model is empty");
-
-            var checkUser = await _userRepository.FindByEmailAsync(user.EmailOrNickname!);
-            if (checkUser is null)
-            {
-                checkUser = await _userRepository.FindByNicknameAsync(user.EmailOrNickname!);
-                if (checkUser is null) return new GeneralResponce(false, "There is no account with this email or nickname.");
+                await DownloadFile(user.AvatarImage, updateUser);
             }
 
-            var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
+            await _userRepository.UpdateAsync(user);
+            await _logRepository.WriteLogsAsync(new Logs { IdUser = user.UserId, Action = Constants.Update });
 
-            var checkPass = new PasswordHasher<object>().VerifyHashedPassword(null!, checkUser.PasswordHash, user.Password!);
-            if (checkPass != PasswordVerificationResult.Success) return new GeneralResponce(false, "Invalid password");
-
-            return new GeneralResponce(true, "Success!");
+            return new UpdateUserResponce(true, user);
         }
 
-        public async Task<GeneralResponce> UpdateAsync(UpdateUser user)
+        private async Task<string> DownloadFile(IFormFile file, User user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var filePath = Path.Combine(Constants.PathToUserAvatar!, $"user-id{user.Id}.png");
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                    user.AvatarImagePath = filePath;
+                    return filePath;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error while downloading file: {ex.Message}", ex);
+            }
         }
     }
 }

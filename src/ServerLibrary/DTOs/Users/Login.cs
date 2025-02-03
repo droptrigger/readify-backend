@@ -12,5 +12,8 @@ namespace HelpLibrary.DTOs.Users
         [DataType(DataType.Password)]
         [Required]
         public string? Password { get; set; }
+
+        [Required]
+        public string? Device {  get; set; }
     }
 }

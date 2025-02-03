@@ -250,13 +250,19 @@ public partial class ReadifyContext : DbContext
         modelBuilder.Entity<UserSession>(entity =>
         {
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IdUser).HasColumnName("id_user");
+            entity.Property(e => e.RefreshTokenHash)
+                .HasMaxLength(255)
+                .HasColumnName("refresh_token_hash");
+            entity.Property(e => e.DeviceType)
+                .HasMaxLength(50)
+                .HasColumnName("device_type");
             entity.Property(e => e.ExpiresIn)
                 .HasColumnType("datetime")
                 .HasColumnName("expires_in");
-            entity.Property(e => e.IdUser).HasColumnName("id_user");
-            entity.Property(e => e.Refresh)
-                .HasMaxLength(255)
-                .HasColumnName("refresh");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
 
             entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.UserSessions)
                 .HasForeignKey(d => d.IdUser)

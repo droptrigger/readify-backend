@@ -5,12 +5,15 @@ namespace HelpLibrary.DTOs.Users
 {
     public class UpdateUser
     {
+        [Required]
+        public int UserId {  get; set; }
+
         [MinLength(5, ErrorMessage = "Минимальное количество символов: 5")]
         [MaxLength(50, ErrorMessage = "Максимальное количество символов: 50")]
         public string? Nickname { get; set; } = null!;
 
         [MaxLength(150)]
-        public string? Description { get; set; }
+        public string? Description { get; set; } = null!;
 
         public IFormFile? AvatarImage { get; set; } = null!;
 

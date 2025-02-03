@@ -9,9 +9,13 @@ public partial class UserSession
 
     public int IdUser { get; set; }
 
-    public string Refresh { get; set; } = null!;
+    public string RefreshTokenHash { get; set; } = null!;
+
+    public string DeviceType { get; set; } = null!;
 
     public DateTime ExpiresIn { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 
     public virtual User IdUserNavigation { get; set; } = null!;
 }
