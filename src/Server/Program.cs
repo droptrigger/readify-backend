@@ -57,6 +57,7 @@ builder.Services.Configure<JwtSection>(builder.Configuration.GetSection("JwtSect
 // Register repositories
 builder.Services.AddScoped<ILogRepository, LogRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshRepository, RefreshRepository>();
 
 // Register services
 builder.Services.AddScoped<IAuthentificatonService, AuthentificatonService>();

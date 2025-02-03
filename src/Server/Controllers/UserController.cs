@@ -23,8 +23,15 @@ namespace Server.Controllers
         {
             if (user == null) return BadRequest("Model is empty");
 
-            var result = await _userService.UpdateUserAsync(user);
-            return Ok(result);
+            try
+            {
+                var result = await _userService.UpdateUserAsync(user);
+                return Ok(result);
+            }
+            catch (Exception ex) 
+            { 
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
