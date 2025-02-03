@@ -79,15 +79,11 @@ namespace ServerLibrary.Services.Implementations
 
             if (checkSession is not null)
             {
-                Console.WriteLine("test");
-
                 await _userRepository.UpdateRefreshAsync(checkSession, refreshToken);
                 return new LoginResponce(true, "Success!", token, refreshToken);
             }
             else
             {
-                Console.WriteLine("test2");
-
                 var session = await _userRepository.AddSessionToDatabaseAsync(
                     new UserSession()
                     {
@@ -106,6 +102,8 @@ namespace ServerLibrary.Services.Implementations
 
         private async Task<string> GenerateTokenAsync(User user, string device)
         {
+            Console.WriteLine(_config.Value.SecretKey);
+
             var claims = new List<Claim>() 
             {
                 new Claim("id", user.Id.ToString()),
@@ -121,7 +119,7 @@ namespace ServerLibrary.Services.Implementations
                 signingCredentials: 
                 new SigningCredentials(
                     new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(_config.Value.Key!)),
+                        Encoding.UTF8.GetBytes(_config.Value.SecretKey!)),
                             SecurityAlgorithms.HmacSha256));
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.GenerateToken });

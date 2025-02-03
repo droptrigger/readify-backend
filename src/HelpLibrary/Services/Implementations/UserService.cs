@@ -33,10 +33,10 @@ namespace ServerLibrary.Services.Implementations
 
             if (user.AvatarImage is not null)
             {
-                if (File.Exists(Constants.PathToUserAvatar + updateUser.AvatarImagePath) &&
+                if (File.Exists(updateUser.AvatarImagePath) &&
                     (Constants.PathToUserAvatar + updateUser.AvatarImagePath != Constants.DefaultAvatar))
 
-                    File.Delete(Constants.PathToUserAvatar + updateUser.AvatarImagePath);
+                    File.Delete(updateUser.AvatarImagePath);
 
                 await DownloadFile(user.AvatarImage, updateUser);
             }
