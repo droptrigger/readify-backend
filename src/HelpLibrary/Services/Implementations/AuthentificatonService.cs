@@ -12,6 +12,8 @@ using ServerLibrary.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using ServerLibrary.Helpers.Exceptions;
+using ServerLibrary.Helpers.Exceptions.User;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -19,24 +21,30 @@ namespace ServerLibrary.Services.Implementations
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogRepository _logRepository;
+        private readonly IRefreshRepository _refreshRepository;
         private readonly IOptions<JwtSection> _config;
 
-        public AuthentificatonService(IUserRepository userRepository, ILogRepository logRepository, IOptions<JwtSection> config)
+        public AuthentificatonService(
+            IUserRepository userRepository, 
+            ILogRepository logRepository,
+            IOptions<JwtSection> config,
+            IRefreshRepository refreshRepository)
         {
             _userRepository = userRepository;
             _logRepository = logRepository;
             _config = config;
+            _refreshRepository = refreshRepository;
         }
 
         public async Task<GeneralResponce> RegisterUserAsync(Registration user)
         {
-            if (user == null) return new GeneralResponce(false, "Model is empty");
+            if (user == null) throw new NullReferenceException("Model is empty");
 
             var checkUser = await _userRepository.FindByEmailAsync(user.Email!.ToLower());
-            if (checkUser != null) return new GeneralResponce(false, "The user is already registered");
+            if (checkUser != null) throw new EmailIsBusyException("The user is already registered");
 
             checkUser = await _userRepository.FindByNicknameAsync(user.Nickname!.ToLower());
-            if (checkUser != null) return new GeneralResponce(false, "The user is already registered");
+            if (checkUser != null) throw new NicknameIsBusyException("The user is already registered");
 
             var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
 
@@ -51,40 +59,50 @@ namespace ServerLibrary.Services.Implementations
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = addUser.Id, Action = Constants.Register });
 
-            return new GeneralResponce(true, "You have successfully registered"); 
+            return new GeneralResponce("You have successfully registered"); 
         }
 
         public async Task<LoginResponce> SignInAsync(Login user)
         {
-            if (user is null) return new LoginResponce(false, "Model is empty");
+            if (user is null) throw new NullReferenceException("Model is empty");
 
             var checkUser = await _userRepository.FindByEmailAsync(user.EmailOrNickname!.ToLower());
             if (checkUser is null)
             {
                 checkUser = await _userRepository.FindByNicknameAsync(user.EmailOrNickname!.ToLower());
-                if (checkUser is null) return new LoginResponce(false, "There is no account with this email or nickname.");
+                if (checkUser is null) throw new NotFoundUserException("There is no account with this email or nickname.");
             }
 
             var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
 
             var checkPass = new PasswordHasher<object>().VerifyHashedPassword(null!, checkUser.PasswordHash, user.Password!);
-            if (checkPass != PasswordVerificationResult.Success) return new LoginResponce(false, "Invalid password");
+            if (checkPass != PasswordVerificationResult.Success) throw new InvalidPasswordException("Invalid password");
 
             string token = await GenerateTokenAsync(checkUser, user.Device!.ToLower());
             string refreshToken = GenerateRefreshToken();
 
-            var checkSession = await _userRepository.FindSessionByUserIdAsync(checkUser.Id!, user.Device!);
+            var checkSession = await _refreshRepository.FindSessionByUserIdAsync(checkUser.Id!, user.Device!);
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = checkUser.Id, Action = Constants.Login});
 
             if (checkSession is not null)
             {
-                await _userRepository.UpdateRefreshAsync(checkSession, refreshToken);
-                return new LoginResponce(true, "Success!", token, refreshToken);
+                // Expire
+                if (checkSession.ExpiresIn < DateTime.UtcNow)
+                {
+                    var newToken = await RefreshToken(checkSession.RefreshTokenHash);
+                    await _refreshRepository.UpdateRefreshAsync(checkSession, newToken.RefreshToken);
+                    return new LoginResponce("Success!", token, newToken.RefreshToken);
+                }
+                else
+                {
+                    await _refreshRepository.UpdateRefreshAsync(checkSession, refreshToken);
+                    return new LoginResponce("Success!", token, refreshToken);
+                }
             }
             else
             {
-                var session = await _userRepository.AddSessionToDatabaseAsync(
+                var session = await _refreshRepository.AddSessionToDatabaseAsync(
                     new UserSession()
                     {
                         IdUser = checkUser.Id,
@@ -95,7 +113,7 @@ namespace ServerLibrary.Services.Implementations
                     }
                 );
 
-                return new LoginResponce(true, "Success!", token, refreshToken);
+                return new LoginResponce("Success!", token, refreshToken);
             }
             
         }
@@ -140,21 +158,21 @@ namespace ServerLibrary.Services.Implementations
 
         public async Task<LoginResponce> RefreshToken(string refreshToken)
         {
-            if (refreshToken is null) return new LoginResponce(false, "Refresh token is required");
+            if (refreshToken is null) throw new NullReferenceException("Model is empty");
 
-            var findToken = await _userRepository.FindRefreshAsync(refreshToken);
-            if (findToken is null) return new LoginResponce(false, "Refresh token is required");
+            var findToken = await _refreshRepository.FindRefreshAsync(refreshToken);
+            if (findToken is null) throw new NotFoundException("Not found");
 
             var user = await _userRepository.FindByIdAsync(findToken.IdUser);
-            if (user is null) return new LoginResponce(false, "Refresh token could not be generated because user not found");
+            if (user is null) throw new NotFoundUserException("User not found");
 
             string jwtToken = await GenerateTokenAsync(user, findToken.DeviceType);
             string newRefreshToken = GenerateRefreshToken();
 
-            await _userRepository.UpdateRefreshAsync(findToken, newRefreshToken);
+            await _refreshRepository.UpdateRefreshAsync(findToken, newRefreshToken);
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.Refresh });
-            return new LoginResponce(true, "Token refreshed successfully", jwtToken, refreshToken);
+            return new LoginResponce("Token refreshed successfully", jwtToken, refreshToken);
         }
     }
 }

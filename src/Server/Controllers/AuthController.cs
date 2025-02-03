@@ -1,5 +1,6 @@
 ﻿using HelpLibrary.DTOs.Users;
 using Microsoft.AspNetCore.Mvc;
+using ServerLibrary.Helpers.Exceptions.User;
 using ServerLibrary.Services.Interfaces;
 
 namespace Server.Controllers
@@ -20,8 +21,15 @@ namespace Server.Controllers
         public async Task<IActionResult> Register([FromForm] Registration user)
         {
             if (user == null) return BadRequest("Model is empty");
-            var result = await _authService.RegisterUserAsync(user);
-            return Ok(result);
+
+            try
+            {
+                var result = await _authService.RegisterUserAsync(user);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("login")]
@@ -29,8 +37,16 @@ namespace Server.Controllers
         public async Task<IActionResult> Login([FromForm] Login user)
         {
             if (user == null) return BadRequest("Model is empty");
-            var result = await _authService.SignInAsync(user);
-            return Ok(result);
+
+            try
+            {
+                var result = await _authService.SignInAsync(user);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("refresh")]
@@ -38,8 +54,15 @@ namespace Server.Controllers
         public async Task<IActionResult> Refresh([FromForm] string refreshToken)
         {
             if (refreshToken == null) return BadRequest("Model is empty");
-            var result = await _authService.RefreshToken(refreshToken);
-            return Ok(result);
+            try
+            {
+                var result = await _authService.RefreshToken(refreshToken);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

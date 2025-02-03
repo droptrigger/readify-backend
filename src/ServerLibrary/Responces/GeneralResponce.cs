@@ -1,4 +1,4 @@
 ﻿namespace HelpLibrary.Responces
 {
-    public record GeneralResponce(bool Flag, string Message = null!);
+    public record GeneralResponce(string Message = null!);
 }
