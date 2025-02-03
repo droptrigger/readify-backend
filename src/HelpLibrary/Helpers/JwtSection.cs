@@ -8,9 +8,7 @@ namespace ServerLibrary.Helpers
 {
     public class JwtSection
     {
-        public string? Key { get; set; }
-        public string? Issuer { get; set; }
-        public string? Audience { get; set; }
+        public string? SecretKey { get; set; }
         public TimeSpan Expires { get; set; }
     }
 }
