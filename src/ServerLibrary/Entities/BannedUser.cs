@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HelpLibrary;
+namespace HelpLibrary.Entities;
 
 public partial class BannedUser
 {
