@@ -3,15 +3,10 @@ using HelpLibrary.DTOs;
 using HelpLibrary.Entities;
 using HelpLibrary.Responces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using ServerLibrary.Helpers;
 using ServerLibrary.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ServerLibrary.Services.Interfaces;
+using ServerLibrary.Helpers.Exceptions.User;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -29,7 +24,7 @@ namespace ServerLibrary.Services.Implementations
         public async Task<UpdateUserResponce> UpdateUserAsync(UpdateUser user)
         {
             var updateUser = await _userRepository.FindByIdAsync(user.UserId);
-            if (updateUser is null) return new UpdateUserResponce(false);
+            if (updateUser is null) throw new NotFoundUserException("Not found user");
 
             if (user.AvatarImage is not null)
             {
@@ -44,7 +39,7 @@ namespace ServerLibrary.Services.Implementations
             await _userRepository.UpdateAsync(user);
             await _logRepository.WriteLogsAsync(new Logs { IdUser = user.UserId, Action = Constants.Update });
 
-            return new UpdateUserResponce(true, user);
+            return new UpdateUserResponce(user);
         }
 
         private async Task<string> DownloadFile(IFormFile file, User user)

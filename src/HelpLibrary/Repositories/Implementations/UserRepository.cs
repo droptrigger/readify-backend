@@ -17,16 +17,9 @@ namespace ServerLibrary.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<UserSession> AddSessionToDatabaseAsync(UserSession session)
-        {
-            var result = _context.Add(session!);
-            await _context.SaveChangesAsync();
-            return result.Entity;
-        }
-
         public async Task<User> AddToDatabaseAsync(User user)
         {
-            var result = _context.Add(user!);
+            var result = await _context.AddAsync(user!);
             await _context.SaveChangesAsync();
             return result.Entity;
         }
@@ -40,12 +33,6 @@ namespace ServerLibrary.Repositories.Implementations
         public async Task<User> FindByNicknameAsync(string nickname) =>
              await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
-        public async Task<UserSession> FindRefreshAsync(string refreshToken) =>
-            await _context.UserSessions.FirstOrDefaultAsync(s => s.RefreshTokenHash == refreshToken);
-
-        public async Task<UserSession> FindSessionByUserIdAsync(int userId, string device) =>
-            await _context.UserSessions.FirstOrDefaultAsync(s => s.IdUser == userId && s.DeviceType == device);
-
         public async Task<User> UpdateAsync(UpdateUser updateUser)
         {
             var findUser = await FindByIdAsync(updateUser.UserId);
@@ -57,15 +44,6 @@ namespace ServerLibrary.Repositories.Implementations
 
             await _context.SaveChangesAsync();
             return findUser;
-        }
-
-        public async Task<UserSession> UpdateRefreshAsync(UserSession session, string refreshToken)
-        {
-            session.RefreshTokenHash = refreshToken;
-            session.CreatedAt = DateTime.UtcNow;
-            session.ExpiresIn = DateTime.UtcNow.AddDays(15);
-            await _context.SaveChangesAsync();
-            return session;
         }
     }
 }

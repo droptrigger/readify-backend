@@ -12,6 +12,11 @@ using ServerLibrary.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using ServerLibrary.Helpers.Exceptions;
+using ServerLibrary.Helpers.Exceptions.User;
+using System.Net.Mail;
+using System.Net;
+using HelpLibrary.DTOs.Mail;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -19,24 +24,43 @@ namespace ServerLibrary.Services.Implementations
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogRepository _logRepository;
+        private readonly IRefreshRepository _refreshRepository;
+        private readonly IMailRepository _mailRepository;
         private readonly IOptions<JwtSection> _config;
 
-        public AuthentificatonService(IUserRepository userRepository, ILogRepository logRepository, IOptions<JwtSection> config)
+        public AuthentificatonService(
+            IUserRepository userRepository, 
+            ILogRepository logRepository,
+            IOptions<JwtSection> config,
+            IRefreshRepository refreshRepository,
+            IMailRepository mailRepository)
         {
             _userRepository = userRepository;
             _logRepository = logRepository;
             _config = config;
+            _refreshRepository = refreshRepository;
+            _mailRepository = mailRepository;
         }
 
         public async Task<GeneralResponce> RegisterUserAsync(Registration user)
         {
-            if (user == null) return new GeneralResponce(false, "Model is empty");
+            if (user == null) throw new NullReferenceException("Model is empty");
 
             var checkUser = await _userRepository.FindByEmailAsync(user.Email!.ToLower());
-            if (checkUser != null) return new GeneralResponce(false, "The user is already registered");
+            if (checkUser != null) throw new EmailIsBusyException("The user is already registered");
 
             checkUser = await _userRepository.FindByNicknameAsync(user.Nickname!.ToLower());
-            if (checkUser != null) return new GeneralResponce(false, "The user is already registered");
+            if (checkUser != null) throw new NicknameIsBusyException("The user is already registered");
+
+            var code = await _mailRepository.VerifyCodeAsync(new ConfirmCode { Code = user.Code, Email = user.Email });
+            if (code == null) throw new InvalidCodeException("The code has is incorrect");
+            if (code.ExpiresIn < DateTime.UtcNow)
+            {
+                await _mailRepository.DeleteCodeAsync(code);
+                throw new InvalidCodeException("The code has expired");
+            }
+
+            await _mailRepository.DeleteCodeAsync(code);
 
             var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
 
@@ -51,53 +75,52 @@ namespace ServerLibrary.Services.Implementations
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = addUser.Id, Action = Constants.Register });
 
-            return new GeneralResponce(true, "You have successfully registered"); 
+            return new GeneralResponce("You have successfully registered"); 
         }
 
         public async Task<LoginResponce> SignInAsync(Login user)
         {
-            if (user is null) return new LoginResponce(false, "Model is empty");
+            if (user is null) throw new NullReferenceException("Model is empty");
 
             var checkUser = await _userRepository.FindByEmailAsync(user.EmailOrNickname!.ToLower());
             if (checkUser is null)
             {
                 checkUser = await _userRepository.FindByNicknameAsync(user.EmailOrNickname!.ToLower());
-                if (checkUser is null) return new LoginResponce(false, "There is no account with this email or nickname.");
+                if (checkUser is null) throw new NotFoundUserException("There is no account with this email or nickname.");
             }
 
             var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
 
             var checkPass = new PasswordHasher<object>().VerifyHashedPassword(null!, checkUser.PasswordHash, user.Password!);
-            if (checkPass != PasswordVerificationResult.Success) return new LoginResponce(false, "Invalid password");
+            if (checkPass != PasswordVerificationResult.Success) throw new InvalidPasswordException("Invalid password");
 
             string token = await GenerateTokenAsync(checkUser, user.Device!.ToLower());
             string refreshToken = GenerateRefreshToken();
 
-            var checkSession = await _userRepository.FindSessionByUserIdAsync(checkUser.Id!, user.Device!);
+            var checkSession = await _refreshRepository.FindSessionByUserIdAsync(checkUser.Id!, user.Device!);
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = checkUser.Id, Action = Constants.Login});
 
             if (checkSession is not null)
             {
-                await _userRepository.UpdateRefreshAsync(checkSession, refreshToken);
-                return new LoginResponce(true, "Success!", token, refreshToken);
+                await _refreshRepository.UpdateRefreshAsync(checkSession, refreshToken);
+                return new LoginResponce("Success!", token, refreshToken);
             }
             else
             {
-                var session = await _userRepository.AddSessionToDatabaseAsync(
+                var session = await _refreshRepository.AddSessionToDatabaseAsync(
                     new UserSession()
                     {
                         IdUser = checkUser.Id,
                         RefreshTokenHash = refreshToken,
                         DeviceType = user.Device!,
-                        ExpiresIn = DateTime.UtcNow.AddDays(15),
+                        ExpiresIn = DateTime.UtcNow.AddDays(150),
                         CreatedAt = DateTime.UtcNow,
                     }
                 );
 
-                return new LoginResponce(true, "Success!", token, refreshToken);
+                return new LoginResponce("Success!", token, refreshToken);
             }
-            
         }
 
         private async Task<string> GenerateTokenAsync(User user, string device)
@@ -140,21 +163,87 @@ namespace ServerLibrary.Services.Implementations
 
         public async Task<LoginResponce> RefreshToken(string refreshToken)
         {
-            if (refreshToken is null) return new LoginResponce(false, "Refresh token is required");
+            if (refreshToken is null) throw new NullReferenceException("Model is empty");
 
-            var findToken = await _userRepository.FindRefreshAsync(refreshToken);
-            if (findToken is null) return new LoginResponce(false, "Refresh token is required");
+            var findToken = await _refreshRepository.FindRefreshAsync(refreshToken);
+            if (findToken is null) throw new NotFoundException("Not found");
 
             var user = await _userRepository.FindByIdAsync(findToken.IdUser);
-            if (user is null) return new LoginResponce(false, "Refresh token could not be generated because user not found");
+            if (user is null) throw new NotFoundUserException("User not found");
 
             string jwtToken = await GenerateTokenAsync(user, findToken.DeviceType);
-            string newRefreshToken = GenerateRefreshToken();
-
-            await _userRepository.UpdateRefreshAsync(findToken, newRefreshToken);
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.Refresh });
-            return new LoginResponce(true, "Token refreshed successfully", jwtToken, refreshToken);
+
+            // Expire
+            if (findToken.ExpiresIn < DateTime.UtcNow)
+            {
+                string newRefreshToken = GenerateRefreshToken();
+                await _refreshRepository.UpdateRefreshAsync(findToken, newRefreshToken);
+                return new LoginResponce("Token refreshed successfully", jwtToken, newRefreshToken);
+            }
+
+            return new LoginResponce("Token refreshed successfully", jwtToken);
+        }
+
+        public async Task<GeneralResponce> LogOut(string refreshToken)
+        {
+            if (refreshToken is null) throw new NullReferenceException("Model is empty");
+
+            await _refreshRepository.DeleteSession(refreshToken);
+
+            return new GeneralResponce("Success");
+        }
+
+        public async Task SendRegisterEmailCodeAsync(string email)
+        {
+            var user = await _userRepository.FindByEmailAsync(email);
+            if (user is not null) throw new Exception("User already register");
+
+            var model = await _mailRepository.FindByEmailAsync(email);
+            if (model is not null) await _mailRepository.DeleteCodeAsync(model);
+
+            string code = GenerateCode();
+            await _mailRepository.WriteCodeAsync(new ConfirmCode
+            {
+                Email = email,
+                Code = code,
+            });
+
+            string smtpServer = "smtp.mail.ru";
+            int smtpPort = 587;
+            string smtpUsername = "readify@mail.ru";
+            string smtpPassword = "...";
+
+            try
+            {
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.From = new MailAddress(smtpUsername, "Readify");
+                message.To.Add(email);
+                message.Subject = "Подтвердите адрес электронной почты";
+
+                message.Body = Constants.HtmlTemplate!.Replace("{email}", email).Replace("{code}", code);
+
+                using (SmtpClient smtpClient = new SmtpClient(smtpServer, smtpPort))
+                {
+                    smtpClient.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+                    smtpClient.EnableSsl = true;
+
+                    smtpClient.Send(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private string GenerateCode()
+        {
+            Random random = new Random();
+            int number = random.Next(1, 999999);
+            return number.ToString("D6");
         }
     }
 }

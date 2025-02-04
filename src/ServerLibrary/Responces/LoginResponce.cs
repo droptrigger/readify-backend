@@ -1,4 +1,4 @@
 ﻿namespace HelpLibrary.Responces
 {
-    public record LoginResponce(bool Flag, string Message = null!, string Token = null!, string RefreshToken = null!);
+    public record LoginResponce(string Message = null!, string Token = null!, string RefreshToken = null!);
 }
