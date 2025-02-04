@@ -53,11 +53,11 @@ namespace ServerLibrary.Services.Implementations
             if (checkUser != null) throw new NicknameIsBusyException("The user is already registered");
 
             var code = await _mailRepository.VerifyCodeAsync(new ConfirmCode { Code = user.Code, Email = user.Email });
-            if (code == null) throw new InvalidCodeException("The code has expired or is incorrect");
+            if (code == null) throw new InvalidCodeException("The code has is incorrect");
             if (code.ExpiresIn < DateTime.UtcNow)
             {
                 await _mailRepository.DeleteCodeAsync(code);
-                throw new InvalidCodeException("The code has expired or is incorrect");
+                throw new InvalidCodeException("The code has expired");
             }
 
             await _mailRepository.DeleteCodeAsync(code);
@@ -213,7 +213,7 @@ namespace ServerLibrary.Services.Implementations
             string smtpServer = "smtp.mail.ru";
             int smtpPort = 587;
             string smtpUsername = "readify@mail.ru";
-            string smtpPassword = "QLfUg3qcsaJABixnvre5";
+            string smtpPassword = "8LmcTQdNkp8qrGEMSLW4";
 
             try
             {
