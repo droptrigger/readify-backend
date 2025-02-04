@@ -25,5 +25,8 @@ namespace HelpLibrary.DTOs.Users
         [MaxLength(50, ErrorMessage = "Максимальное количество символов: 50")]
         [Required]
         public string? Password { get; set; }
+
+        [Required]
+        public string? Code {  get; set; }
     }
 }

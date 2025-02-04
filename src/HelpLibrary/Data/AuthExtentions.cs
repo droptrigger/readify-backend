@@ -15,9 +15,6 @@ namespace ServerLibrary.Data
             var config = configuration.GetSection("JwtSection")
                 .Get<JwtSection>();
 
-
-            Console.WriteLine(config.SecretKey);
-
             serviceCollections.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o =>
                 {
@@ -27,7 +24,7 @@ namespace ServerLibrary.Data
                         ValidateAudience = false,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.SecretKey))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config!.SecretKey!))
                     };
             });
 
