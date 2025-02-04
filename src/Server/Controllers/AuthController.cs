@@ -19,7 +19,7 @@ namespace Server.Controllers
 
         [HttpPost("register")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Register([FromForm] Registration user)
+        public async Task<IActionResult> Register([FromForm] RegistrationDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
 
@@ -52,7 +52,7 @@ namespace Server.Controllers
 
         [HttpPost("login")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Login([FromForm] Login user)
+        public async Task<IActionResult> Login([FromForm] LoginDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
 

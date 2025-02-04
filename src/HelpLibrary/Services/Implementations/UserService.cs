@@ -7,6 +7,7 @@ using ServerLibrary.Helpers;
 using ServerLibrary.Repositories.Interfaces;
 using ServerLibrary.Services.Interfaces;
 using ServerLibrary.Helpers.Exceptions.User;
+using ServerLibrary.Helpers.Exceptions;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -14,14 +15,46 @@ namespace ServerLibrary.Services.Implementations
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogRepository _logRepository;
+        private readonly ISubscribeRepository _subscribeRepository;
 
-        public UserService(IUserRepository userRepository, ILogRepository logRepository)
+        public UserService(IUserRepository userRepository, ILogRepository logRepository, ISubscribeRepository subscribeRepository)
         {
             _userRepository = userRepository;
             _logRepository = logRepository;
+            _subscribeRepository = subscribeRepository;
         }
 
-        public async Task<UpdateUserResponce> UpdateUserAsync(UpdateUser user)
+        public async Task<List<UserInfoDTO>> GetAllSubscribersAsync(int idAuthor) =>
+            await _subscribeRepository.GetSubscribersByIdAsync(idAuthor);
+
+
+        public async Task<List<UserInfoDTO>> GetAllSubscriptionsAsync(int idUser) =>
+            await _subscribeRepository.GetSubscriptionsByIdAsync(idUser);
+        
+
+        public async Task<GeneralResponce> SubscribeAsync(SubscribeDTO subscribe)
+        {
+            if (subscribe is null) throw new NullReferenceException("Model is empty");
+
+            var sub = await _subscribeRepository.GetSubByIdAsync(subscribe);
+            if (sub is not null) throw new AlreadySubscribedExceprion("You have already subscribed to this user");
+
+            await _subscribeRepository.SubscribeAsync(subscribe);
+            return new GeneralResponce("Success");
+        }
+
+        public async Task<GeneralResponce> UnsubscribeAsync(SubscribeDTO unsubscribe)
+        {
+            if (unsubscribe is null) throw new NullReferenceException("Model is empty");
+
+            var sub = await _subscribeRepository.GetSubByIdAsync(unsubscribe);
+            if (sub is null) throw new NotFoundException("Don't found");
+
+            await _subscribeRepository.UnsubscribeAsync(unsubscribe);
+            return new GeneralResponce("Success");
+        }
+
+        public async Task<UpdateUserResponce> UpdateUserAsync(UpdateUserDTO user)
         {
             var updateUser = await _userRepository.FindByIdAsync(user.UserId);
             if (updateUser is null) throw new NotFoundUserException("Not found user");
@@ -37,7 +70,7 @@ namespace ServerLibrary.Services.Implementations
             }
 
             await _userRepository.UpdateAsync(user);
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = user.UserId, Action = Constants.Update });
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = user.UserId, Action = Constants.Update });
 
             return new UpdateUserResponce(user);
         }

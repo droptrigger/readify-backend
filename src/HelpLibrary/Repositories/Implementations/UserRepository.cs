@@ -33,7 +33,7 @@ namespace ServerLibrary.Repositories.Implementations
         public async Task<User> FindByNicknameAsync(string nickname) =>
              await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
-        public async Task<User> UpdateAsync(UpdateUser updateUser)
+        public async Task<User> UpdateAsync(UpdateUserDTO updateUser)
         {
             var findUser = await FindByIdAsync(updateUser.UserId);
 

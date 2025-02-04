@@ -42,7 +42,7 @@ namespace ServerLibrary.Services.Implementations
             _mailRepository = mailRepository;
         }
 
-        public async Task<GeneralResponce> RegisterUserAsync(Registration user)
+        public async Task<GeneralResponce> RegisterUserAsync(RegistrationDTO user)
         {
             if (user == null) throw new NullReferenceException("Model is empty");
 
@@ -73,12 +73,12 @@ namespace ServerLibrary.Services.Implementations
                 CreatedAt = DateTime.UtcNow,
             });
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = addUser.Id, Action = Constants.Register });
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = addUser.Id, Action = Constants.Register });
 
             return new GeneralResponce("You have successfully registered"); 
         }
 
-        public async Task<LoginResponce> SignInAsync(Login user)
+        public async Task<LoginResponce> SignInAsync(LoginDTO user)
         {
             if (user is null) throw new NullReferenceException("Model is empty");
 
@@ -99,7 +99,7 @@ namespace ServerLibrary.Services.Implementations
 
             var checkSession = await _refreshRepository.FindSessionByUserIdAsync(checkUser.Id!, user.Device!);
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = checkUser.Id, Action = Constants.Login});
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = checkUser.Id, Action = Constants.Login});
 
             if (checkSession is not null)
             {
@@ -145,7 +145,7 @@ namespace ServerLibrary.Services.Implementations
                         Encoding.UTF8.GetBytes(_config.Value.SecretKey!)),
                             SecurityAlgorithms.HmacSha256));
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.GenerateToken });
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = user.Id, Action = Constants.GenerateToken });
 
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
@@ -173,7 +173,7 @@ namespace ServerLibrary.Services.Implementations
 
             string jwtToken = await GenerateTokenAsync(user, findToken.DeviceType);
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.Refresh });
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = user.Id, Action = Constants.Refresh });
 
             // Expire
             if (findToken.ExpiresIn < DateTime.UtcNow)

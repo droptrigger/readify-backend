@@ -59,6 +59,7 @@ builder.Services.AddScoped<ILogRepository, LogRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshRepository, RefreshRepository>();
 builder.Services.AddScoped<IMailRepository, MailRepository>();
+builder.Services.AddScoped<ISubscribeRepository, SubscribeRepository>();
 
 // Register services
 builder.Services.AddScoped<IAuthentificatonService, AuthentificatonService>();

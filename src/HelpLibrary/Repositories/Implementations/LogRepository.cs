@@ -14,7 +14,7 @@ namespace ServerLibrary.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<Log> WriteLogsAsync(Logs logs)
+        public async Task<Log> WriteLogsAsync(LogsDTO logs)
         {
             var result = await _context.AddAsync(new Log()
             {

@@ -31,7 +31,7 @@ namespace ServerLibrary.Repositories.Interfaces
         /// </summary>
         /// <param name="user">Объект передачи данных, содержащий новые данные пользователя</param>
         /// <returns>Обновленный пользователь</returns>
-        Task<User> UpdateAsync(UpdateUser user);
+        Task<User> UpdateAsync(UpdateUserDTO user);
 
         /// <summary>
         /// Метод добавления пользователя в БД
