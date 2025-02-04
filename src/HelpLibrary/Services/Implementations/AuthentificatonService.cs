@@ -213,7 +213,7 @@ namespace ServerLibrary.Services.Implementations
             string smtpServer = "smtp.mail.ru";
             int smtpPort = 587;
             string smtpUsername = "readify@mail.ru";
-            string smtpPassword = "8LmcTQdNkp8qrGEMSLW4";
+            string smtpPassword = "...";
 
             try
             {
