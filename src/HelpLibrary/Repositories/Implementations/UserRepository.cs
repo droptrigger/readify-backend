@@ -19,7 +19,7 @@ namespace ServerLibrary.Repositories.Implementations
 
         public async Task<User> AddToDatabaseAsync(User user)
         {
-            var result = _context.Add(user!);
+            var result = await _context.AddAsync(user!);
             await _context.SaveChangesAsync();
             return result.Entity;
         }

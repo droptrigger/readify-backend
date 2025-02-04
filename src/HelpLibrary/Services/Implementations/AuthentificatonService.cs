@@ -14,6 +14,9 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using ServerLibrary.Helpers.Exceptions;
 using ServerLibrary.Helpers.Exceptions.User;
+using System.Net.Mail;
+using System.Net;
+using HelpLibrary.DTOs.Mail;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -22,18 +25,21 @@ namespace ServerLibrary.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly ILogRepository _logRepository;
         private readonly IRefreshRepository _refreshRepository;
+        private readonly IMailRepository _mailRepository;
         private readonly IOptions<JwtSection> _config;
 
         public AuthentificatonService(
             IUserRepository userRepository, 
             ILogRepository logRepository,
             IOptions<JwtSection> config,
-            IRefreshRepository refreshRepository)
+            IRefreshRepository refreshRepository,
+            IMailRepository mailRepository)
         {
             _userRepository = userRepository;
             _logRepository = logRepository;
             _config = config;
             _refreshRepository = refreshRepository;
+            _mailRepository = mailRepository;
         }
 
         public async Task<GeneralResponce> RegisterUserAsync(Registration user)
@@ -45,6 +51,16 @@ namespace ServerLibrary.Services.Implementations
 
             checkUser = await _userRepository.FindByNicknameAsync(user.Nickname!.ToLower());
             if (checkUser != null) throw new NicknameIsBusyException("The user is already registered");
+
+            var code = await _mailRepository.VerifyCodeAsync(new ConfirmCode { Code = user.Code, Email = user.Email });
+            if (code == null) throw new InvalidCodeException("The code has expired or is incorrect");
+            if (code.ExpiresIn < DateTime.UtcNow)
+            {
+                await _mailRepository.DeleteCodeAsync(code);
+                throw new InvalidCodeException("The code has expired or is incorrect");
+            }
+
+            await _mailRepository.DeleteCodeAsync(code);
 
             var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
 
@@ -87,18 +103,8 @@ namespace ServerLibrary.Services.Implementations
 
             if (checkSession is not null)
             {
-                // Expire
-                if (checkSession.ExpiresIn < DateTime.UtcNow)
-                {
-                    var newToken = await RefreshToken(checkSession.RefreshTokenHash);
-                    await _refreshRepository.UpdateRefreshAsync(checkSession, newToken.RefreshToken);
-                    return new LoginResponce("Success!", token, newToken.RefreshToken);
-                }
-                else
-                {
-                    await _refreshRepository.UpdateRefreshAsync(checkSession, refreshToken);
-                    return new LoginResponce("Success!", token, refreshToken);
-                }
+                await _refreshRepository.UpdateRefreshAsync(checkSession, refreshToken);
+                return new LoginResponce("Success!", token, refreshToken);
             }
             else
             {
@@ -108,14 +114,13 @@ namespace ServerLibrary.Services.Implementations
                         IdUser = checkUser.Id,
                         RefreshTokenHash = refreshToken,
                         DeviceType = user.Device!,
-                        ExpiresIn = DateTime.UtcNow.AddDays(15),
+                        ExpiresIn = DateTime.UtcNow.AddDays(150),
                         CreatedAt = DateTime.UtcNow,
                     }
                 );
 
                 return new LoginResponce("Success!", token, refreshToken);
             }
-            
         }
 
         private async Task<string> GenerateTokenAsync(User user, string device)
@@ -167,12 +172,78 @@ namespace ServerLibrary.Services.Implementations
             if (user is null) throw new NotFoundUserException("User not found");
 
             string jwtToken = await GenerateTokenAsync(user, findToken.DeviceType);
-            string newRefreshToken = GenerateRefreshToken();
-
-            await _refreshRepository.UpdateRefreshAsync(findToken, newRefreshToken);
 
             await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.Refresh });
-            return new LoginResponce("Token refreshed successfully", jwtToken, refreshToken);
+
+            // Expire
+            if (findToken.ExpiresIn < DateTime.UtcNow)
+            {
+                string newRefreshToken = GenerateRefreshToken();
+                await _refreshRepository.UpdateRefreshAsync(findToken, newRefreshToken);
+                return new LoginResponce("Token refreshed successfully", jwtToken, newRefreshToken);
+            }
+
+            return new LoginResponce("Token refreshed successfully", jwtToken);
+        }
+
+        public async Task<GeneralResponce> LogOut(string refreshToken)
+        {
+            if (refreshToken is null) throw new NullReferenceException("Model is empty");
+
+            await _refreshRepository.DeleteSession(refreshToken);
+
+            return new GeneralResponce("Success");
+        }
+
+        public async Task SendRegisterEmailCodeAsync(string email)
+        {
+            var user = await _userRepository.FindByEmailAsync(email);
+            if (user is not null) throw new Exception("User already register");
+
+            var model = await _mailRepository.FindByEmailAsync(email);
+            if (model is not null) await _mailRepository.DeleteCodeAsync(model);
+
+            string code = GenerateCode();
+            await _mailRepository.WriteCodeAsync(new ConfirmCode
+            {
+                Email = email,
+                Code = code,
+            });
+
+            string smtpServer = "smtp.mail.ru";
+            int smtpPort = 587;
+            string smtpUsername = "readify@mail.ru";
+            string smtpPassword = "QLfUg3qcsaJABixnvre5";
+
+            try
+            {
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.From = new MailAddress(smtpUsername, "Readify");
+                message.To.Add(email);
+                message.Subject = "Подтвердите адрес электронной почты";
+
+                message.Body = Constants.HtmlTemplate!.Replace("{email}", email).Replace("{code}", code);
+
+                using (SmtpClient smtpClient = new SmtpClient(smtpServer, smtpPort))
+                {
+                    smtpClient.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+                    smtpClient.EnableSsl = true;
+
+                    smtpClient.Send(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private string GenerateCode()
+        {
+            Random random = new Random();
+            int number = random.Next(1, 999999);
+            return number.ToString("D6");
         }
     }
 }

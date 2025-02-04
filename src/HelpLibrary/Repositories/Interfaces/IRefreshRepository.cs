@@ -34,5 +34,11 @@ namespace ServerLibrary.Repositories.Interfaces
         /// <param name="refreshToken">Рефреш-токен</param>
         /// <returns>Найденная сессия</returns>
         Task<UserSession> FindRefreshAsync(string refreshToken);
+
+        /// <summary>
+        /// Метод удаления сессии из БД
+        /// </summary>
+        /// <param name="refreshToken"></param>
+        Task DeleteSession(string refreshToken);
     }
 }

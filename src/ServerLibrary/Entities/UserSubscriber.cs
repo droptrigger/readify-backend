@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HelpLibrary.Entities;
+﻿namespace HelpLibrary.Entities;
 
 public partial class UserSubscriber
 {

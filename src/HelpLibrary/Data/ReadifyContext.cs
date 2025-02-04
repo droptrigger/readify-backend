@@ -24,6 +24,8 @@ public partial class ReadifyContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<СonfirmationСode> СonfirmationСodes { get; set; }
+
     public virtual DbSet<Library> Libraries { get; set; }
 
     public virtual DbSet<LikesReview> LikesReviews { get; set; }
@@ -142,6 +144,20 @@ public partial class ReadifyContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<СonfirmationСode>(entity =>
+        {
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Code)
+                .HasMaxLength(6)
+                .HasColumnName("code");
+            entity.Property(e => e.Email)
+                .HasMaxLength(150)
+                .HasColumnName("email");
+            entity.Property(e => e.ExpiresIn)
+                .HasColumnType("datetime")
+                .HasColumnName("expires_in");
         });
 
         modelBuilder.Entity<Library>(entity =>

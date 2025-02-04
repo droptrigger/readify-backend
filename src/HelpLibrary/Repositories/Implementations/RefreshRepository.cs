@@ -21,9 +21,19 @@ namespace ServerLibrary.Repositories.Implementations
 
         public async Task<UserSession> AddSessionToDatabaseAsync(UserSession session)
         {
-            var result = _context.Add(session!);
+            var result = await _context.AddAsync(session!);
             await _context.SaveChangesAsync();
             return result.Entity;
+        }
+
+        public async Task DeleteSession(string refreshToken)
+        {
+            var session = await FindRefreshAsync(refreshToken);
+            if (session is not null)
+            {
+                _context.UserSessions.Remove(session);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<UserSession> FindRefreshAsync(string refreshToken) =>
