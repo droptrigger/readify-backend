@@ -34,9 +34,21 @@ namespace ServerLibrary.Repositories.Implementations.UserI
 
         public async Task RemoveFromDatabaseAsync(User user)
         {
+            var subs = await GetAllSub(user.Id);
+            _context.UserSubscribers.RemoveRange(subs);
+
+            var book = await GetAllBooks(user.Id);
+            _context.Books.RemoveRange(book);
+
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
+
+        private async Task<List<Book>> GetAllBooks(int idUser) =>
+            await _context.Books.Where(b => b.IdAuthor == idUser).ToListAsync();
+
+        private async Task<List<UserSubscriber>> GetAllSub(int idUser) =>
+            await _context.UserSubscribers.Where(us => us.IdSubscriber == idUser || us.IdAuthor == idUser).ToListAsync();
 
         public async Task<User> UpdateAsync(UpdateUserDTO updateUser)
         {

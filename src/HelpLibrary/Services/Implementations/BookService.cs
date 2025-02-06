@@ -16,7 +16,6 @@ namespace ServerLibrary.Services.Implementations
         private readonly IGenreRepository _genreRepository;
         private readonly ILogRepository _logRepository;
         private readonly IBookRepository _bookRepository;
-        private readonly IBookReviewRepository _bookReviewRepository;
         
         public BookService(
             IGenreRepository genreRepository, 
@@ -27,7 +26,6 @@ namespace ServerLibrary.Services.Implementations
             _genreRepository = genreRepository;
             _logRepository = logRepository;
             _bookRepository = bookRepository;
-            _bookReviewRepository = bookReviewRepository;
         }
 
         public async Task<GeneralResponce> AddBookAsync(AddBookDTO book)
@@ -78,6 +76,10 @@ namespace ServerLibrary.Services.Implementations
         {
             var book = await _bookRepository.FindBookByIdAsync(id);
             if (book is null) throw new Exception("Don't found");
+
+
+
+
 
             // TODO: Каскодность
             await _bookRepository.RemoveFromDatabaseAsync(book);

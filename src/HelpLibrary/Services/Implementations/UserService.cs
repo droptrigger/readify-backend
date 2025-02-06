@@ -89,8 +89,6 @@ namespace ServerLibrary.Services.Implementations
             var user = await _userRepository.FindByIdAsync(id);
             if (user is null) throw new NotFoundUserException("User not found");
 
-            // TODO: каскадность
-
             await _userRepository.RemoveFromDatabaseAsync(user);
 
             return new GeneralResponce("Success");

@@ -33,9 +33,20 @@ namespace ServerLibrary.Repositories.Implementations.Books
 
         public async Task RemoveFromDatabaseAsync(Book book)
         {
+            var reviews = await GetAllReviewsBookAsync(book.Id);
+
+            _context.BookReviews.RemoveRange(reviews);
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Для каскадности
+        /// </summary>
+        /// <param name="idBook"></param>
+        /// <returns></returns>
+        private async Task<List<BookReview>> GetAllReviewsBookAsync(int idBook) =>
+            await _context.BookReviews.Where(br => br.IdBook == idBook).ToListAsync();
 
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
