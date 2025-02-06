@@ -1,14 +1,14 @@
 ﻿using HelpLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
 using ServerLibrary.Data;
-using ServerLibrary.Repositories.Interfaces;
+using ServerLibrary.Repositories.Interfaces.IUser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerLibrary.Repositories.Implementations
+namespace ServerLibrary.Repositories.Implementations.UserI
 {
     public class RefreshRepository : IRefreshRepository
     {

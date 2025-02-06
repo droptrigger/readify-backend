@@ -22,7 +22,7 @@ public partial class ReadifyContext : DbContext
 
     public virtual DbSet<Bookmark> Bookmarks { get; set; }
 
-    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Genre> Genres { get; set; }
 
     public virtual DbSet<СonfirmationСode> СonfirmationСodes { get; set; }
 
@@ -75,11 +75,12 @@ public partial class ReadifyContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(250)
                 .HasColumnName("description");
+            entity.Property(e => e.PageQuantity).HasColumnName("page_quantity");
             entity.Property(e => e.FileBookPath)
                 .HasMaxLength(200)
                 .HasColumnName("file_book_path");
             entity.Property(e => e.IdAuthor).HasColumnName("id_author");
-            entity.Property(e => e.IdCategory).HasColumnName("id_category");
+            entity.Property(e => e.IdGenre).HasColumnName("id_genre");
             entity.Property(e => e.IsPrivate).HasColumnName("is_private");
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
@@ -91,7 +92,7 @@ public partial class ReadifyContext : DbContext
                 .HasConstraintName("FK_Books_Users");
 
             entity.HasOne(d => d.IdCategoryNavigation).WithMany(p => p.Books)
-                .HasForeignKey(d => d.IdCategory)
+                .HasForeignKey(d => d.IdGenre)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Books_Categories");
         });
@@ -138,7 +139,7 @@ public partial class ReadifyContext : DbContext
                 .HasConstraintName("FK_Bookmarks_Libraries");
         });
 
-        modelBuilder.Entity<Category>(entity =>
+        modelBuilder.Entity<Genre>(entity =>
         {
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name)

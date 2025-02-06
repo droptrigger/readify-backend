@@ -17,9 +17,8 @@ namespace Server.Controllers
             _authService = authService;
         }
 
-        [HttpPost("register")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Register([FromForm] RegistrationDTO user)
+        [HttpPost("/auth/register")]
+        public async Task<IActionResult> Register(RegistrationDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
 
@@ -34,15 +33,14 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("send-mail")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> SendMail([FromForm] string email)
+        [HttpPost("/auth/send-mail")]
+        public async Task<IActionResult> SendMail(string email)
         {
             if (email == null) return BadRequest("Model is empty");
             try
             {
-                await _authService.SendRegisterEmailCodeAsync(email);
-                return Ok("Success");
+                var result = await _authService.SendRegisterEmailCodeAsync(email);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -50,9 +48,8 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("login")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Login([FromForm] LoginDTO user)
+        [HttpPost("/auth/login")]
+        public async Task<IActionResult> Login(LoginDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
 
@@ -67,8 +64,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("refresh")]
-        [Consumes("multipart/form-data")]
+        [HttpPost("/auth/refresh")]
         public async Task<IActionResult> Refresh([FromForm] string refreshToken)
         {
             if (refreshToken == null) return BadRequest("Model is empty");
@@ -83,10 +79,9 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("logout")]
+        [HttpPost("/auth/logout")]
         [Authorize]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> LogOut([FromForm] string refreshToken)
+        public async Task<IActionResult> LogOut(string refreshToken)
         {
             if (refreshToken == null) return BadRequest("Model is empty");
             try

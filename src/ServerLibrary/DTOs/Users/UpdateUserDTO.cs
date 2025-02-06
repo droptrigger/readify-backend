@@ -5,6 +5,7 @@ namespace HelpLibrary.DTOs.Users
 {
     public class UpdateUserDTO
     {
+        [Key]
         [Required]
         public int UserId {  get; set; }
 

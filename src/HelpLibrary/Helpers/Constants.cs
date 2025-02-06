@@ -14,10 +14,30 @@
         public static string? Update { get; } = "Update";
         public static string? Refresh { get; } = "Refresh";
         public static string? GenerateToken { get; } = "Generate token";
-        public static string? PathToUserAvatar { get; } = @"..\Server\wwwroot\images\users\";
-        public static string? DefaultAvatar { get; } = @"..\Server\wwwroot\images\users\default.png";
 
-        public static string? HtmlTemplate { get; } = @"
+        public static string? Subscribe { get; } = "Subscribe on ";
+        public static string? UnSubscribe { get; } = "Unsubscribe by ";
+
+        public static string? DeleteUser { get; } = "Was deleted";
+        public static string? Ban { get; } = "Was banned";
+        public static string? Unban { get; } = "Was unblocked";
+
+        public static string? AddLibrary { get; } = "Added a book to the library. Book id: ";
+        public static string? DeleteLibrary { get; } = "Deleted a book to the library. Book id: ";
+
+        public static string? PathBookFiles { get; } = @"images\books\files\";
+        public static string? PathBookImages { get; } = @"images\books\covers\";
+
+        public static string? PathToBookFiles { get; } = @"..\Server\wwwroot\images\books\files\";
+        public static string? PathToBookImages { get; } = @"..\Server\wwwroot\images\books\covers\";
+
+        public static string? PathUserImages { get; } = @"images\users\"; 
+        public static string? PathToUserAvatar { get; } = @"..\Server\wwwroot\images\users\";
+
+        public static string? DefaultAvatar { get; } = @"images\users\default-cover.png";
+        public static string? DefaultBookImage { get; } = @"images\books\covers\default-avatar.png";
+
+        public static string? HtmlMailTemplate { get; } = @"
                                             <!DOCTYPE html>
                                             <html lang=""en"">
                                             <head>
@@ -56,7 +76,7 @@
                                                     }
 
                                                     h2 {
-	                                                    font-size: 30px;
+	                                                    font-size: 37px;
 	                                                    font-weight: normal;
 	                                                    margin-bottom: 30px;
 	                                                    margin-top: 30px;

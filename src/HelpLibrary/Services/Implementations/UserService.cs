@@ -8,6 +8,9 @@ using ServerLibrary.Repositories.Interfaces;
 using ServerLibrary.Services.Interfaces;
 using ServerLibrary.Helpers.Exceptions.User;
 using ServerLibrary.Helpers.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using HelpLibrary.DTOs.Subscribe;
+using ServerLibrary.Repositories.Interfaces.IUser;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -36,10 +39,14 @@ namespace ServerLibrary.Services.Implementations
         {
             if (subscribe is null) throw new NullReferenceException("Model is empty");
 
+            if (subscribe.SubscriberId == subscribe.AuthorId) throw new Exception();
+
             var sub = await _subscribeRepository.GetSubByIdAsync(subscribe);
             if (sub is not null) throw new AlreadySubscribedExceprion("You have already subscribed to this user");
 
             await _subscribeRepository.SubscribeAsync(subscribe);
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = subscribe.SubscriberId, Action = Constants.Subscribe + subscribe.AuthorId });
+
             return new GeneralResponce("Success");
         }
 
@@ -51,6 +58,8 @@ namespace ServerLibrary.Services.Implementations
             if (sub is null) throw new NotFoundException("Don't found");
 
             await _subscribeRepository.UnsubscribeAsync(unsubscribe);
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = unsubscribe.SubscriberId, Action = Constants.UnSubscribe + unsubscribe.AuthorId });
+
             return new GeneralResponce("Success");
         }
 
@@ -62,7 +71,7 @@ namespace ServerLibrary.Services.Implementations
             if (user.AvatarImage is not null)
             {
                 if (File.Exists(updateUser.AvatarImagePath) &&
-                    (Constants.PathToUserAvatar + updateUser.AvatarImagePath != Constants.DefaultAvatar))
+                    (updateUser.AvatarImagePath != Constants.DefaultAvatar))
 
                     File.Delete(updateUser.AvatarImagePath);
 
@@ -75,16 +84,29 @@ namespace ServerLibrary.Services.Implementations
             return new UpdateUserResponce(user);
         }
 
+        public async Task<GeneralResponce> RemoveUserAsync(int id)
+        {
+            var user = await _userRepository.FindByIdAsync(id);
+            if (user is null) throw new NotFoundUserException("User not found");
+
+            // TODO: каскадность
+
+            await _userRepository.RemoveFromDatabaseAsync(user);
+
+            return new GeneralResponce("Success");
+        }
+
         private async Task<string> DownloadFile(IFormFile file, User user)
         {
             try
             {
-                var filePath = Path.Combine(Constants.PathToUserAvatar!, $"user-id{user.Id}.png");
+                string fileName = $"user-id{user.Id}.png";
+                var filePath = Path.Combine(Constants.PathToUserAvatar!,fileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
-                    user.AvatarImagePath = filePath;
+                    user.AvatarImagePath = Constants.PathUserImages + fileName;
                     return filePath;
                 }
             }

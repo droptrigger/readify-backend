@@ -1,7 +1,8 @@
-﻿using HelpLibrary.DTOs.Users;
+﻿using HelpLibrary.DTOs.Subscribe;
+using HelpLibrary.DTOs.Users;
 using HelpLibrary.Entities;
 
-namespace ServerLibrary.Repositories.Interfaces
+namespace ServerLibrary.Repositories.Interfaces.IUser
 {
     public interface ISubscribeRepository
     {
@@ -37,5 +38,21 @@ namespace ServerLibrary.Repositories.Interfaces
         /// <param name="id">Идентификатор пользователя</param>
         /// <returns>Список всех подписок</returns>
         Task<List<UserInfoDTO>> GetSubscriptionsByIdAsync(int id);
+
+        /// <summary>
+        /// МЕТОД ДЛЯ КАСКАДНОСТИ
+        /// Метод получения всех объектов из бд
+        /// </summary>
+        /// <param name="authoId">Индентификатор автора</param>
+        /// <returns>Список объектов для удаления</returns>
+        Task<List<UserSubscriber>> GetAllSubsByAuthorAsync(int authoId);
+
+        /// <summary>
+        /// МЕТОД ДЛЯ КАСКАДНОСТИ
+        /// Метод получения всех объектов из бд
+        /// </summary>
+        /// <param name="subId">Индентификатор подписчика</param>
+        /// <returns>Список объектов для удаления</returns>
+        Task<List<UserSubscriber>> GetAllSubsBySubAsync(int subId);
     }
 }

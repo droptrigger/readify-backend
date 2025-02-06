@@ -1,4 +1,5 @@
-﻿using HelpLibrary.DTOs.Users;
+﻿using HelpLibrary.DTOs.Subscribe;
+using HelpLibrary.DTOs.Users;
 using HelpLibrary.Entities;
 using HelpLibrary.Responces;
 
@@ -12,6 +13,13 @@ namespace ServerLibrary.Services.Interfaces
         /// <param name="user">Объект передачи данных, который содержит обновленную информацию о пользователе</param>
         /// <returns>Объект класса UpdateUserResponce, содержащий обновленные данные</returns>
         Task<UpdateUserResponce> UpdateUserAsync(UpdateUserDTO user);
+
+        /// <summary>
+        /// Метод удаления пользователя
+        /// </summary>
+        /// <param name="id">Идентификатор пользователя</param>
+        /// <returns>Ответ сервера</returns>
+        Task<GeneralResponce> RemoveUserAsync(int id);
 
         /// <summary>
         /// Метод для подписки на пользователя

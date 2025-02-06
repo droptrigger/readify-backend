@@ -36,7 +36,8 @@ namespace ServerLibrary.Services.Interfaces
         /// <summary>
         /// Метод отправки кода подтверждения почты
         /// </summary>
-        /// <param name="email">email получателя</param>
-        Task SendRegisterEmailCodeAsync(string email);
+        /// <param name="email">Email получателя</param>
+        /// <returns>Ответ сервера</returns>
+        Task<GeneralResponce> SendRegisterEmailCodeAsync(string email);
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HelpLibrary.Entities;
 
-public partial class Category
+public partial class Genre
 {
     public int Id { get; set; }
 

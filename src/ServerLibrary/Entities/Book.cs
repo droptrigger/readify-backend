@@ -11,13 +11,15 @@ public partial class Book
 
     public string Description { get; set; } = null!;
 
+    public int PageQuantity { get; set; }
+
     public int IdAuthor { get; set; }
 
     public string CoverImagePath { get; set; } = null!;
 
     public string FileBookPath { get; set; } = null!;
 
-    public int IdCategory { get; set; }
+    public int? IdGenre { get; set; } = null;
 
     public bool IsPrivate { get; set; }
 
@@ -27,7 +29,7 @@ public partial class Book
 
     public virtual User IdAuthorNavigation { get; set; } = null!;
 
-    public virtual Category IdCategoryNavigation { get; set; } = null!;
+    public virtual Genre IdCategoryNavigation { get; set; } = null!;
 
     public virtual ICollection<Library> Libraries { get; set; } = new List<Library>();
 }

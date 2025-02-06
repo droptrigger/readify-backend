@@ -17,6 +17,7 @@ using ServerLibrary.Helpers.Exceptions.User;
 using System.Net.Mail;
 using System.Net;
 using HelpLibrary.DTOs.Mail;
+using ServerLibrary.Repositories.Interfaces.IUser;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -133,7 +134,8 @@ namespace ServerLibrary.Services.Implementations
                 new Claim("nickname", user.Nickname),
                 new Claim("email", user.Email),
                 new Claim("role", Constants.Roles[user.IdRole]),
-                new Claim("device", device)
+                new Claim("device", device),
+                new Claim("is_banned", user.IsBanned.ToString())
             };
 
             var jwtToken = new JwtSecurityToken(
@@ -195,7 +197,7 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task SendRegisterEmailCodeAsync(string email)
+        public async Task<GeneralResponce> SendRegisterEmailCodeAsync(string email)
         {
             var user = await _userRepository.FindByEmailAsync(email);
             if (user is not null) throw new Exception("User already register");
@@ -223,7 +225,7 @@ namespace ServerLibrary.Services.Implementations
                 message.To.Add(email);
                 message.Subject = "Подтвердите адрес электронной почты";
 
-                message.Body = Constants.HtmlTemplate!.Replace("{email}", email).Replace("{code}", code);
+                message.Body = Constants.HtmlMailTemplate!.Replace("{email}", email).Replace("{code}", code);
 
                 using (SmtpClient smtpClient = new SmtpClient(smtpServer, smtpPort))
                 {
@@ -231,11 +233,12 @@ namespace ServerLibrary.Services.Implementations
                     smtpClient.EnableSsl = true;
 
                     smtpClient.Send(message);
+                    return new GeneralResponce("The code has been sent");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 

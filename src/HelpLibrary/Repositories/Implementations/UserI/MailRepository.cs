@@ -3,9 +3,9 @@ using HelpLibrary.DTOs.Mail;
 using HelpLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
 using ServerLibrary.Data;
-using ServerLibrary.Repositories.Interfaces;
+using ServerLibrary.Repositories.Interfaces.IUser;
 
-namespace ServerLibrary.Repositories.Implementations
+namespace ServerLibrary.Repositories.Implementations.UserI
 {
     public class MailRepository : IMailRepository
     {

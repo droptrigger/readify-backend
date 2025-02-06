@@ -1,10 +1,11 @@
-﻿using HelpLibrary.DTOs.Users;
+﻿using HelpLibrary.DTOs.Subscribe;
+using HelpLibrary.DTOs.Users;
 using HelpLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
 using ServerLibrary.Data;
-using ServerLibrary.Repositories.Interfaces;
+using ServerLibrary.Repositories.Interfaces.IUser;
 
-namespace ServerLibrary.Repositories.Implementations
+namespace ServerLibrary.Repositories.Implementations.UserI
 {
     public class SubscribeRepository : ISubscribeRepository
     {
@@ -15,15 +16,20 @@ namespace ServerLibrary.Repositories.Implementations
             _context = context;
         }
 
+        public async Task<List<UserSubscriber>> GetAllSubsByAuthorAsync(int authoId) =>
+            await _context.UserSubscribers.Where(us => us.IdAuthor == authoId).ToListAsync();
+
+        public async Task<List<UserSubscriber>> GetAllSubsBySubAsync(int subId) =>
+            await _context.UserSubscribers.Where(us => us.IdSubscriber == subId).ToListAsync();
+
         public async Task<UserSubscriber> GetSubByIdAsync(SubscribeDTO data) =>
             await _context.UserSubscribers.FirstOrDefaultAsync(us => us.IdAuthor == data.AuthorId && us.IdSubscriber == data.SubscriberId);
 
-        public async Task<List<UserInfoDTO>> GetSubscribersByIdAsync(int id)
-        {
-            var subscribers = await _context.UserSubscribers
-                .Where(us => us.IdAuthor == id) // Фильтруем по IdAuthor
-                .Include(us => us.IdSubscriberNavigation) // Подгружаем данные подписчиков
-                .Select(us => new UserInfoDTO // Проекция на DTO
+        public async Task<List<UserInfoDTO>> GetSubscribersByIdAsync(int id) =>
+             await _context.UserSubscribers
+                .Where(us => us.IdAuthor == id)
+                .Include(us => us.IdSubscriberNavigation)
+                .Select(us => new UserInfoDTO
                 {
                     Id = us.IdSubscriberNavigation.Id,
                     Nickname = us.IdSubscriberNavigation.Nickname,
@@ -31,9 +37,6 @@ namespace ServerLibrary.Repositories.Implementations
                     Name = us.IdSubscriberNavigation.Name
                 })
                 .ToListAsync();
-
-            return subscribers;
-        }
 
         public async Task<List<UserInfoDTO>> GetSubscriptionsByIdAsync(int id)
         {

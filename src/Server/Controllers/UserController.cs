@@ -1,4 +1,5 @@
-﻿using HelpLibrary.DTOs.Users;
+﻿using HelpLibrary.DTOs.Subscribe;
+using HelpLibrary.DTOs.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerLibrary.Services.Interfaces;
@@ -17,7 +18,7 @@ namespace Server.Controllers
             _userService = userService;
         }
 
-        [HttpPut("update")]
+        [HttpPut("/user/update")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDTO user)
         {
@@ -34,8 +35,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("subscribe")]
-        [Consumes("multipart/form-data")]
+        [HttpPost("/user/subscribe")]
         public async Task<IActionResult> Subscribe([FromForm] SubscribeDTO sub)
         {
             if (sub == null) return BadRequest("Model is empty");
@@ -51,8 +51,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("unsubscribe")]
-        [Consumes("multipart/form-data")]
+        [HttpPost("/user/unsubscribe")]
         public async Task<IActionResult> UnSubscribe([FromForm] SubscribeDTO unsub)
         {
             if (unsub == null) return BadRequest("Model is empty");
@@ -68,7 +67,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("subscribers")]
+        [HttpGet("/user/subscribers")]
         public async Task<IActionResult> GetSubscribers(int id)
         {
             try
@@ -82,7 +81,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("subscriptions")]
+        [HttpGet("/user/subscriptions")]
         public async Task<IActionResult> GetSubscriptions(int id)
         {
             try

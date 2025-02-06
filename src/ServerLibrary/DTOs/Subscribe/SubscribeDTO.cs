@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HelpLibrary.DTOs.Users
+namespace HelpLibrary.DTOs.Subscribe
 {
     public class SubscribeDTO
     {
