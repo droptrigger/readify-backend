@@ -28,10 +28,22 @@ namespace ServerLibrary.Services.Interfaces
         /// <returns>Ответ сервера</returns>
         Task<GeneralResponce> UpdateBookAsync(UpdateBookDTO book);
 
+        Task<Book> GetBookAsync(int id);
+
+
+        Task<GeneralResponce> AddBookReviewAsync(AddReviewDTO review);
+        Task<BookReview> GetBookReviewAsync(int id);
+        Task<GeneralResponce> UpdateBookReviewAsync(UpdateReviewDTO update);
+        Task<GeneralResponce> DeleteBookReviewAsync(int id);
+
+        Task<GeneralResponce> AddLikeAsync(AddLikeReviewDTO like);
+        Task<LikesReview> GetLikeAsync(int id);
+        Task<GeneralResponce> UpdateLikeAsync(UpdateLikeReviewDTO updateLike);
+        Task<GeneralResponce> RemoveLikeAsync(int idLike);
+
+
         Task<GeneralResponce> AddGenreAsync(string name);
-
         Task<GeneralResponce> RemoveGenreAsync(int id);
-
         Task<GeneralResponce> UpdateGenreAsync(GenreDTO genre);
     }
 }
