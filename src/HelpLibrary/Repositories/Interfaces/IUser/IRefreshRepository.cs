@@ -1,7 +1,7 @@
 ﻿
 using HelpLibrary.Entities;
 
-namespace ServerLibrary.Repositories.Interfaces
+namespace ServerLibrary.Repositories.Interfaces.IUser
 {
     public interface IRefreshRepository
     {

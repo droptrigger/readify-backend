@@ -1,7 +1,7 @@
 ﻿using HelpLibrary.DTOs.Users;
 using HelpLibrary.Entities;
 
-namespace ServerLibrary.Repositories.Interfaces
+namespace ServerLibrary.Repositories.Interfaces.IUser
 {
     public interface IUserRepository
     {
@@ -31,7 +31,7 @@ namespace ServerLibrary.Repositories.Interfaces
         /// </summary>
         /// <param name="user">Объект передачи данных, содержащий новые данные пользователя</param>
         /// <returns>Обновленный пользователь</returns>
-        Task<User> UpdateAsync(UpdateUser user);
+        Task<User> UpdateAsync(UpdateUserDTO user);
 
         /// <summary>
         /// Метод добавления пользователя в БД
@@ -39,5 +39,11 @@ namespace ServerLibrary.Repositories.Interfaces
         /// <param name="user">Новый объект класса User</param>
         /// <returns>Созданный пользователь</returns>
         Task<User> AddToDatabaseAsync(User user);
+
+        /// <summary>
+        /// Метод удалаления пользователя из БД
+        /// </summary>
+        /// <param name="user">Объект класса User</param>
+        Task RemoveFromDatabaseAsync(User user);
     }
 }

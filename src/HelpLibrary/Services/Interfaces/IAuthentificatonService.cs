@@ -10,14 +10,14 @@ namespace ServerLibrary.Services.Interfaces
         /// </summary>
         /// <param name="user">Объект передачи данных, содержащий информацию, необходимю для регистрации</param>
         /// <returns>Ответ сервера, содержащий сообщение об удачной регистрации</returns>
-        Task<GeneralResponce> RegisterUserAsync(Registration user);
+        Task<GeneralResponce> RegisterUserAsync(RegistrationDTO user);
 
         /// <summary>
         /// Метод для входа в аккаунт
         /// </summary>
         /// <param name="user">Объект передачи данных, содержащий информацию, необходимую для входа</param>
         /// <returns>Ответ сервера, содержащий сообщение об удачном входе, Access и Refresh токен</returns>
-        Task<LoginResponce> SignInAsync(Login user);
+        Task<LoginResponce> SignInAsync(LoginDTO user);
 
         /// <summary>
         /// Метод выхода из аккаунта
@@ -36,7 +36,8 @@ namespace ServerLibrary.Services.Interfaces
         /// <summary>
         /// Метод отправки кода подтверждения почты
         /// </summary>
-        /// <param name="email">email получателя</param>
-        Task SendRegisterEmailCodeAsync(string email);
+        /// <param name="email">Email получателя</param>
+        /// <returns>Ответ сервера</returns>
+        Task<GeneralResponce> SendRegisterEmailCodeAsync(string email);
     }
 }

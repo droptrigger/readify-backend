@@ -17,6 +17,7 @@ using ServerLibrary.Helpers.Exceptions.User;
 using System.Net.Mail;
 using System.Net;
 using HelpLibrary.DTOs.Mail;
+using ServerLibrary.Repositories.Interfaces.IUser;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -42,7 +43,7 @@ namespace ServerLibrary.Services.Implementations
             _mailRepository = mailRepository;
         }
 
-        public async Task<GeneralResponce> RegisterUserAsync(Registration user)
+        public async Task<GeneralResponce> RegisterUserAsync(RegistrationDTO user)
         {
             if (user == null) throw new NullReferenceException("Model is empty");
 
@@ -73,12 +74,12 @@ namespace ServerLibrary.Services.Implementations
                 CreatedAt = DateTime.UtcNow,
             });
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = addUser.Id, Action = Constants.Register });
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = addUser.Id, Action = Constants.Register });
 
             return new GeneralResponce("You have successfully registered"); 
         }
 
-        public async Task<LoginResponce> SignInAsync(Login user)
+        public async Task<LoginResponce> SignInAsync(LoginDTO user)
         {
             if (user is null) throw new NullReferenceException("Model is empty");
 
@@ -99,7 +100,7 @@ namespace ServerLibrary.Services.Implementations
 
             var checkSession = await _refreshRepository.FindSessionByUserIdAsync(checkUser.Id!, user.Device!);
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = checkUser.Id, Action = Constants.Login});
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = checkUser.Id, Action = Constants.Login});
 
             if (checkSession is not null)
             {
@@ -133,7 +134,8 @@ namespace ServerLibrary.Services.Implementations
                 new Claim("nickname", user.Nickname),
                 new Claim("email", user.Email),
                 new Claim("role", Constants.Roles[user.IdRole]),
-                new Claim("device", device)
+                new Claim("device", device),
+                new Claim("is_banned", user.IsBanned.ToString())
             };
 
             var jwtToken = new JwtSecurityToken(
@@ -145,7 +147,7 @@ namespace ServerLibrary.Services.Implementations
                         Encoding.UTF8.GetBytes(_config.Value.SecretKey!)),
                             SecurityAlgorithms.HmacSha256));
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.GenerateToken });
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = user.Id, Action = Constants.GenerateToken });
 
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
@@ -173,7 +175,7 @@ namespace ServerLibrary.Services.Implementations
 
             string jwtToken = await GenerateTokenAsync(user, findToken.DeviceType);
 
-            await _logRepository.WriteLogsAsync(new Logs { IdUser = user.Id, Action = Constants.Refresh });
+            await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = user.Id, Action = Constants.Refresh });
 
             // Expire
             if (findToken.ExpiresIn < DateTime.UtcNow)
@@ -195,7 +197,7 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task SendRegisterEmailCodeAsync(string email)
+        public async Task<GeneralResponce> SendRegisterEmailCodeAsync(string email)
         {
             var user = await _userRepository.FindByEmailAsync(email);
             if (user is not null) throw new Exception("User already register");
@@ -223,7 +225,7 @@ namespace ServerLibrary.Services.Implementations
                 message.To.Add(email);
                 message.Subject = "Подтвердите адрес электронной почты";
 
-                message.Body = Constants.HtmlTemplate!.Replace("{email}", email).Replace("{code}", code);
+                message.Body = Constants.HtmlMailTemplate!.Replace("{email}", email).Replace("{code}", code);
 
                 using (SmtpClient smtpClient = new SmtpClient(smtpServer, smtpPort))
                 {
@@ -231,11 +233,12 @@ namespace ServerLibrary.Services.Implementations
                     smtpClient.EnableSsl = true;
 
                     smtpClient.Send(message);
+                    return new GeneralResponce("The code has been sent");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 

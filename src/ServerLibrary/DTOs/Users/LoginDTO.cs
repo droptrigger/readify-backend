@@ -2,7 +2,7 @@
 
 namespace HelpLibrary.DTOs.Users
 {
-    public class Login
+    public class LoginDTO
     {
         [MinLength(5, ErrorMessage = "Минимальное количество символов: 5")]
         [MaxLength(150, ErrorMessage = "Максимальное количество символов: 150")]

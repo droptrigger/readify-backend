@@ -1,4 +1,5 @@
-﻿using HelpLibrary.DTOs.Users;
+﻿using HelpLibrary.DTOs.Subscribe;
+using HelpLibrary.DTOs.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerLibrary.Services.Interfaces;
@@ -17,9 +18,9 @@ namespace Server.Controllers
             _userService = userService;
         }
 
-        [HttpPut("update")]
+        [HttpPut("/user/update")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UpdateAsync([FromForm] UpdateUser user)
+        public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
 
@@ -30,6 +31,66 @@ namespace Server.Controllers
             }
             catch (Exception ex) 
             { 
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("/user/subscribe")]
+        public async Task<IActionResult> Subscribe([FromForm] SubscribeDTO sub)
+        {
+            if (sub == null) return BadRequest("Model is empty");
+
+            try
+            {
+                var result = await _userService.SubscribeAsync(sub);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("/user/unsubscribe")]
+        public async Task<IActionResult> UnSubscribe([FromForm] SubscribeDTO unsub)
+        {
+            if (unsub == null) return BadRequest("Model is empty");
+
+            try
+            {
+                var result = await _userService.UnsubscribeAsync(unsub);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("/user/subscribers")]
+        public async Task<IActionResult> GetSubscribers(int id)
+        {
+            try
+            {
+                var result = await _userService.GetAllSubscribersAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("/user/subscriptions")]
+        public async Task<IActionResult> GetSubscriptions(int id)
+        {
+            try
+            {
+                var result = await _userService.GetAllSubscriptionsAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
         }

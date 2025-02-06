@@ -2,17 +2,16 @@
 using HelpLibrary.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using ServerLibrary.Data;
-using ServerLibrary.Repositories.Interfaces;
+using ServerLibrary.Repositories.Interfaces.IUser;
 
-namespace ServerLibrary.Repositories.Implementations
+namespace ServerLibrary.Repositories.Implementations.UserI
 {
     public class UserRepository : IUserRepository
     {
         private readonly ReadifyContext _context;
-        
-        public UserRepository(ReadifyContext context) 
+
+        public UserRepository(ReadifyContext context)
         {
             _context = context;
         }
@@ -24,7 +23,7 @@ namespace ServerLibrary.Repositories.Implementations
             return result.Entity;
         }
 
-        public async Task<User> FindByEmailAsync(string email) => 
+        public async Task<User> FindByEmailAsync(string email) =>
             await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
         public async Task<User> FindByIdAsync(int id) =>
@@ -33,7 +32,25 @@ namespace ServerLibrary.Repositories.Implementations
         public async Task<User> FindByNicknameAsync(string nickname) =>
              await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
-        public async Task<User> UpdateAsync(UpdateUser updateUser)
+        public async Task RemoveFromDatabaseAsync(User user)
+        {
+            var subs = await GetAllSub(user.Id);
+            _context.UserSubscribers.RemoveRange(subs);
+
+            var book = await GetAllBooks(user.Id);
+            _context.Books.RemoveRange(book);
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<List<Book>> GetAllBooks(int idUser) =>
+            await _context.Books.Where(b => b.IdAuthor == idUser).ToListAsync();
+
+        private async Task<List<UserSubscriber>> GetAllSub(int idUser) =>
+            await _context.UserSubscribers.Where(us => us.IdSubscriber == idUser || us.IdAuthor == idUser).ToListAsync();
+
+        public async Task<User> UpdateAsync(UpdateUserDTO updateUser)
         {
             var findUser = await FindByIdAsync(updateUser.UserId);
 
