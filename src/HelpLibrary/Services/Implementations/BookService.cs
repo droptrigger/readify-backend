@@ -8,6 +8,7 @@ using ServerLibrary.Repositories.Interfaces;
 using ServerLibrary.Repositories.Interfaces.Books;
 using ServerLibrary.Repositories.Interfaces.BooksInterfaces;
 using ServerLibrary.Services.Interfaces;
+using System.Net;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -16,16 +17,21 @@ namespace ServerLibrary.Services.Implementations
         private readonly IGenreRepository _genreRepository;
         private readonly ILogRepository _logRepository;
         private readonly IBookRepository _bookRepository;
+        private readonly IBookReviewRepository _bookReviewRepository;
+        private readonly ILikesReviewsRepository _likesReviewRepository;
         
         public BookService(
             IGenreRepository genreRepository, 
             ILogRepository logRepository, 
             IBookRepository bookRepository,
-            IBookReviewRepository bookReviewRepository)
+            IBookReviewRepository bookReviewRepository,
+            ILikesReviewsRepository likesReviewsRepository)
         {
             _genreRepository = genreRepository;
             _logRepository = logRepository;
             _bookRepository = bookRepository;
+            _bookReviewRepository = bookReviewRepository;
+            _likesReviewRepository = likesReviewsRepository; 
         }
 
         public async Task<GeneralResponce> AddBookAsync(AddBookDTO book)
@@ -61,6 +67,25 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
+        public async Task<GeneralResponce> AddBookReviewAsync(AddReviewDTO review)
+        {
+            if (review is null) throw new NullReferenceException("Model is empty");
+
+            BookReview newBookReview = new BookReview()
+            {
+                IdAuthor = review.IdAuthor,
+                IdBook = review.IdBook,
+                Comment = review.Comment,
+                Rating = review.Rating,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var result = await _bookReviewRepository.AddToDatabaseAsync(newBookReview);
+            if (result is null) throw new Exception("Error");
+
+            return new GeneralResponce("Success");
+        }
+
         public async Task<GeneralResponce> AddGenreAsync(string name)
         {
             var tryFound = await _genreRepository.FindGenreByNameAsync(name);
@@ -72,16 +97,65 @@ namespace ServerLibrary.Services.Implementations
          
         }
 
+        public async Task<GeneralResponce> AddLikeAsync(AddLikeReviewDTO like)
+        {
+            if (like is null) throw new NullReferenceException("Model is empty");
+
+            var find = await _likesReviewRepository.GetLikeByAuthorIdAndReviewIdAsync(like.IdAuthor, like.IdReview);
+            if (find is not null) throw new Exception("Have you given a reaction");
+
+            LikesReview newLike = new LikesReview()
+            {
+                IdAuthor = like.IdAuthor,
+                IdReview = like.IdReview,
+                ReactionType = like.ReactionType,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var result = await _likesReviewRepository.AddToDatabaseAsync(newLike);
+            if (result is null) throw new Exception("Error");
+
+            return new GeneralResponce("Succes");
+        }
+
+        public async Task<GeneralResponce> DeleteBookReviewAsync(int id)
+        {
+            var findReview = await _bookReviewRepository.FindByIdAsync(id);
+            if (findReview is null) throw new Exception("Don't found");
+
+            await _bookReviewRepository.DeleteByIdAsync(id);
+            return new GeneralResponce("Success");
+        }
+
+        public async Task<Book> GetBookAsync(int id)
+        {
+            var result = await _bookRepository.FindBookByIdAsync(id);
+            if (result is null) throw new Exception("Don't found");
+
+            return result;
+        }
+
+        public async Task<BookReview> GetBookReviewAsync(int id)
+        {
+            var result = await _bookReviewRepository.FindByIdAsync(id);
+            if (result is null) throw new Exception("Don't found");
+
+            return result;
+        }
+
+        public async Task<LikesReview> GetLikeAsync(int id)
+        {
+            var result = await _likesReviewRepository.GetLikesReviewByIdAsync(id);
+            if (result is null) throw new Exception("Don't found");
+
+            return result;
+        }
+
         public async Task<GeneralResponce> RemoveBookAsync(int id)
         {
             var book = await _bookRepository.FindBookByIdAsync(id);
             if (book is null) throw new Exception("Don't found");
 
-
-
-
-
-            // TODO: Каскодность
             await _bookRepository.RemoveFromDatabaseAsync(book);
             return new GeneralResponce("Success");
         }
@@ -96,6 +170,14 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce($"A genre id {id} has been deleted");
         }
 
+        public async Task<GeneralResponce> RemoveLikeAsync(int idLike)
+        {
+            var find = await _likesReviewRepository.GetLikesReviewByIdAsync(idLike);
+            if (find is null) throw new NotFoundException("Don't found");
+            await _likesReviewRepository.DeleteLikeReviewAsync(find);
+            return new GeneralResponce("Success");
+        }
+
         public async Task<GeneralResponce> UpdateBookAsync(UpdateBookDTO book)
         {
             if (book is null) throw new NullReferenceException("Model is empty");
@@ -107,6 +189,16 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
+        public async Task<GeneralResponce> UpdateBookReviewAsync(UpdateReviewDTO update)
+        {
+            if (update is null) throw new NullReferenceException("Model is empty");
+
+            var result = await _bookReviewRepository.UpdateReviewAsync(update);
+            if (result is null) throw new Exception("Error");
+
+            return new GeneralResponce("Success");
+        }
+
         public async Task<GeneralResponce> UpdateGenreAsync(GenreDTO genre)
         {
             var tryFound = await _genreRepository.FindGenreByIdAsync(genre.id);
@@ -115,6 +207,16 @@ namespace ServerLibrary.Services.Implementations
             await _genreRepository.UpdateGenreAsync(genre);
 
             return new GeneralResponce($"A genre id {genre.id} has been updated, new name {genre.newName}");
+        }
+
+        public async Task<GeneralResponce> UpdateLikeAsync(UpdateLikeReviewDTO updateLike)
+        {
+            if (updateLike is null) throw new NullReferenceException("Model is empty");
+
+            var result = await _likesReviewRepository.UpdateLikeReviewAsync(updateLike);
+            if (result is null) throw new Exception("Error");
+
+            return new GeneralResponce("Success");
         }
 
         private async Task<string> DownloadFile(IFormFile file, Book book)

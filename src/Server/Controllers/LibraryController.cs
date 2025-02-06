@@ -72,7 +72,7 @@ namespace Server.Controllers
 
         [HttpGet("/library")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> GetLibrary([FromForm] int id)
+        public async Task<IActionResult> GetLibrary(int id)
         {
             if (id < 0) return BadRequest("Model is empty");
 
