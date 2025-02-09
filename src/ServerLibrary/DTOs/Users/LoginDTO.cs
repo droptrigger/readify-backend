@@ -14,6 +14,6 @@ namespace HelpLibrary.DTOs.Users
         public string? Password { get; set; }
 
         [Required]
-        public string? Device {  get; set; }
+        public string? Device { get; set; }
     }
 }

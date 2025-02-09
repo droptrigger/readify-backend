@@ -1,0 +1,478 @@
+﻿<div id="app">
+    <div class="content-reg" v-if="step === 1">
+        <div class="left">
+            <div class="left-top-text">Создайте свой бесплатный аккаунт</div>
+            <div class="left-descr-text">И начните использовать Readify для комфортного чтения!</div>
+        </div>
+        <div class="right">
+            <div class="already-has-account">Уже есть аккаунт? <a href="/auth/login">Войти →</a></div>
+            <div class="right-top-text">Присоединитесь к Readify</div>
+            <div class="left-naming-input">Email*</div>
+            <label>
+                <input type="email" placeholder="Email" v-model="formData.email">
+            </label>
+            <div class="error-input-text" v-if="!formData.email && showError">* Поле обязательно для заполнения</div>
+            <div class="error-input-text" v-if="!mailIsValide && showError">* Email некорректен</div>
+            <div class="error-input-text" v-if="emailReg">* Пользователь с таким email уже существует</div>
+            <div class="left-naming-input">Пароль*</div>
+            <label>
+                <input type="text" placeholder="Пароль" v-model="formData.password">
+            </label>
+            <div class="error-input-text" v-if="!formData.password && showError">* Поле обязательно для заполнения</div>
+            <div class="error-input-text" v-if="formData.password && formData.password.length < 8">* Пароль слишком короткий</div>
+            <div class="left-under-input-text">
+                Пароль должен содержать минимум 8 символов, включая 1 цифру, 1 заглавную букву, 1 строчную букву и 1 специальный символ.
+            </div>
+            <div class="left-naming-input">Повторите пароль*</div>
+            <label>
+                <input type="text" placeholder="Повторите пароль" v-model="formData.confirmPassword">
+            </label>
+            <div class="error-input-text" v-if="formData.password !== formData.confirmPassword && showError">* Пароли не совпадают</div>
+            <div class="left-naming-input">Имя пользователя*</div>
+            <label>
+                <input type="text" placeholder="Имя пользователя" v-model="formData.username">
+            </label>
+            <div class="error-input-text" v-if="!formData.username && showError">* Поле обязательно для заполнения</div>
+            <div class="error-input-text" v-if="formData.username && !/^[a-zA-Z0-9]+$/.test(formData.username)">* Имя пользователя содержит запрещенные символы</div>
+            <div class="error-input-text" v-if="usernameReg">* Имя пользователя уже занято</div>
+            <div class="left-under-input-text">Имя пользователя может содержать только английские буквы и цифры.</div>
+            <button @@click ="nextStep">Продолжить</button>
+            <div class="under-button-text">Создавая аккаунт, вы подтверждаете, что расскажете о нас своим друзьям</div>
+        </div>
+    </div>
+
+    <div class="content-reg" v-if="step === 2">
+        <div class="left">
+            <div class="left-top-text">А вы точно не робот? Пройдите капчу, ведь роботы так не умеют :)</div>
+            <div class="left-descr-text">Робот сможет сочинить симфонию?</div>
+        </div>
+        <div class="right">
+            <div class="already-has-account">Уже есть аккаунт? <a href="/auth/login">Войти →</a></div>
+            <div class="right-top-text">Что же тут написано? Разберите!</div>
+            <div class="capcha-canvas">{{ captchaText }}</div>
+            <div class="left-naming-input">Введите текст с картинки</div>
+            <label>
+                <input type="text" placeholder="Текст с картинки" v-model="formData.captcha">
+            </label>
+            <div class="error-input-text" v-if="formData.captcha !== captchaText && showError">* Введен неверный текст</div>
+            <button @@click="sendEmail">Продолжить</button>
+        </div>
+    </div>
+
+    <div class="content-reg" v-if="step === 3">
+        <div class="left">
+            <div class="left-top-text">Подтвердите вашу электронную почту</div>
+            <div class="left-descr-text">Поверьте, она потом вам потребуется.</div>
+        </div>
+        <div class="right">
+            <div class="already-has-account">Уже есть аккаунт? <a href="/auth/login">Войти →</a></div>
+            <div class="right-top-text">Подтвердите свой email</div>
+            <div class="email-text">Мы отправили код на адрес {{ formData.email }}</div>
+            <div class="enter-code-text">Введите код</div>
+            <div class="inputs-mail">
+                <input v-for="(digit, index) in codeDigits"
+                       :key="index"
+                       v-model="codeDigits[index]"
+                       maxlength="1"
+                @@input ="handleInput(index)"
+                @@keydown ="handleKeydown($event, index)"
+                       type="text"
+                       class="code-input" />
+            </div>
+            <div class="incorrect-code-message" v-if="!isInvalidCode">Неверный код</div>
+            <button @@click="submitRegistration">Продолжить</button>
+        </div>
+    </div>
+
+    <div class="content-reg" v-if="step === 4">
+        <div class="left">
+            <div class="left-top-text">Последние штрихи</div>
+            <div class="left-descr-text">Расскажите немного о себе, нам очень интересно!</div>
+        </div>
+        <div class="right">
+            <div class="already-has-account"><a href="/home" @@click.prevent="submitRegistration">Пропустить →</a></div>
+            <div class="right-top-text-step4">Давайте оформим ваш профиль</div>
+
+            <div class="avatar-place" @@click ="triggerFileInput">
+                <img :src="avatarPreview" width="200px" height="200px">
+            </div>
+            <input type="file" ref="fileInput" accept="image/png, image/jpg" style="display: none;" @@change ="handleFileChange">
+
+            <div class="left-naming-input">Как вас называть?</div>
+            <label>
+                <input type="text" placeholder="Как вас называть" v-model="formData.name">
+            </label>
+            <div class="error-input-text" v-if="formData.name && formData.name.length < 2">* Минимальное количество символов: 2</div>
+            <div class="left-naming-input">Расскажите немного о себе</div>
+            <div class="description">
+                <textarea placeholder="Расскажите немного о себе" v-model="formData.bio"></textarea>
+            </div>
+            <button @@click ="updateUser">Завершить регистрацию</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    step: 1,
+                    showError: false,
+                    mailIsValide: true,
+                    isInvalidCode: true,
+                    emailReg: false,
+                    usernameReg: false,
+                    first: true,
+                    send: true,
+                    captchaText: generateCaptcha(),
+                    codeDigits: Array(6).fill(""),
+                    avatarPreview: "",
+                    formData: {
+                        email: "",
+                        password: "",
+                        confirmPassword: "",
+                        username: "",
+                        captcha: "",
+                        confirmationCode: "",
+                        name: "",
+                        bio: "",
+                    },
+                };
+            },
+            methods: {
+                // Активация выбора файла
+                triggerFileInput() {
+                    this.$refs.fileInput.click();
+                },
+
+                // Обработка выбора файла
+                handleFileChange(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.selectedFile = file;
+
+                        // Предварительный просмотр
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.avatarPreview = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+
+                handleInput(index) {
+                    // Если введён символ, переходим к следующему инпуту
+                    if (this.codeDigits[index] && index < this.codeDigits.length - 1) {
+                        const nextInput = document.querySelectorAll('.code-input')[index + 1];
+                        if (nextInput) {
+                            nextInput.focus();
+                        }
+                    }
+                },
+
+                handleKeydown(event, index) {
+                    // Если нажата клавиша Backspace и текущее поле пустое, переходим к предыдущему инпуту
+                    if (event.key === 'Backspace' && !this.codeDigits[index] && index > 0) {
+                        const previousInput = document.querySelectorAll('.code-input')[index - 1];
+                        if (previousInput) {
+                            previousInput.focus();
+                        }
+                    }
+                },
+
+                async login() {
+                    try {
+                        const formData = new FormData();
+                        formData.append("EmailOrNickname", this.formData.username);
+                        formData.append("Password", this.formData.password);
+                        formData.append("Device", "Web");
+
+                        const response = await fetch('https://localhost:7207/api/auth/login', {
+                            method: 'POST',
+                            body: formData,
+                        });
+                        if (response.ok) {
+                            const result = await response.json();
+                            console.log("Ответ сервера:", result);
+
+                            localStorage.setItem("accessToken", result.token);
+                        }
+                        else if (!response.ok) {
+                            const errorMessage = await response.text();
+                            console.log(errorMessage);
+                            throw new Error(errorMessage);
+                        }
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
+                },
+
+                async submitRegistration() {
+                    try {
+                        const requestBody = {
+                            Nickname: this.formData.username,
+                            Email: this.formData.email,
+                            Password: this.formData.password,
+                            Code: this.codeDigits.join(""),
+                        };
+
+                        const response = await fetch('https://localhost:7207/api/auth/register',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(requestBody),
+                        });
+
+                        if (!response.ok) {
+                            this.isInvalidCode = false;
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || "Ошибка при регистрации.");
+                        }
+
+                        const result = await response.json();
+
+                        console.log("Регистрация успешна:", result);
+
+                        await this.login();
+                        setTimeout(() => {
+                            this.step++;
+                        }, 3000);
+
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                },
+
+                async checkEmail() {
+                    try {
+                        const formData = new FormData();
+                        formData.append('email', this.formData.email);
+
+                        const response = await fetch('https://localhost:7207/api/auth/checkemail', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        this.emailReg = result;
+
+                        if (!response.ok) {
+                            throw new Error("Пользователь с таким email уже зарегистрирован.");
+                        }
+                    }
+                    catch(error) {
+                        console.log(error);
+                    }
+                },
+
+                async checkUsername() {
+                    try {
+                        const formData = new FormData();
+                        formData.append('username', this.formData.username);
+
+                        const response = await fetch('https://localhost:7207/api/auth/checkusername', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        const result = await response.json();
+                        this.usernameReg = result;
+
+                        if (!response.ok) {
+                            throw new Error("Пользователь с таким username уже зарегистрирован.");
+                        }
+                    }
+                    catch(error) {
+                        console.log(error);
+                    }
+                },
+
+                async sendEmail() {
+                    try {
+                        if (this.send) {
+                            this.send = false;
+                            const response = await fetch('https://localhost:7207/api/auth/send-mail', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(this.formData.email),
+                            });
+
+                            if (!response.ok) {
+                                console.log(this.formData.email);
+                                this.mailIsValide = false;
+                                this.showError = true;
+                                this.captchaText = generateCaptcha();
+                                this.step = 0;
+                            }
+                        }
+                        if (this.step === 2) {
+                            this.step++;
+                        }
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
+                },
+
+                async nextStep() {
+                    if (this.step === 1) {
+                        this.showError = true;
+                        console.log(this.formData.email);
+
+                        if (this.formData.email !== "") {
+                            await this.checkEmail();
+                        }
+                        if (this.formData.username !== "") {
+                            await this.checkUsername();
+                        }
+
+                        if (!this.formData.email || !this.formData.password || !this.formData.confirmPassword || !this.formData.username) {
+                            return;
+                        }
+                        if (this.formData.password !== this.formData.confirmPassword) {
+                            return;
+                        }
+                        if (this.formData.password.length < 8) {
+                            return;
+                        }
+                        if (!/^[a-zA-Z0-9]+$/.test(this.formData.username)) {
+                            return;
+                        }
+                        if (this.usernameReg || this.emailReg) {
+                            return;
+                        }
+                    }
+
+                    if (this.step === 2) {
+                        this.showError = true;
+
+                        if (this.formData.captcha !== this.captchaText) {
+                            return;
+                        }
+
+                        if (!this.mailIsValide) {
+                            this.step = 0;
+                        }
+                    }
+
+                    this.step++;
+                    this.showError = false;
+                },
+
+                async updateUser() {
+                    try {
+                        let token = localStorage.getItem('accessToken');
+                        if (!token) {
+                            const refreshed = await this.refreshToken();
+                            if (!refreshed) {
+                                window.location.href = "/auth/login";
+                                return;
+                            }
+                            token = localStorage.getItem('accessToken');
+                        }
+
+                        const formData = new FormData();
+                        formData.append('Description', this.formData.bio);
+                        formData.append('Name', this.formData.name);
+                        if (this.selectedFile) {
+                            formData.append('AvatarImage', this.selectedFile);
+                        }
+
+                        const response = await fetch('https://localhost:7207/api/user/update', {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            },
+                            body: formData,
+                        });
+
+                        if (response.status === 401) {
+                            const refreshed = await this.refreshToken();
+                            if (refreshed) {
+                                await this.updateUser(); // Повторяем запрос после обновления токена
+                                return;
+                            }
+                        }
+
+                        if (!response.ok) {
+                            throw new Error('Ошибка при обновлении данных');
+                        }
+
+                        window.location.href = "/";
+                    } catch (error) {
+                        console.error('Ошибка:', error.message);
+                    }
+                },
+
+                async refreshToken() {
+                    try {
+                        const response = await fetch('https://localhost:7207/api/auth/refresh', {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok) {
+                            throw new Error(result.message || 'Ошибка при обновлении токена.');
+                        }
+
+                        localStorage.setItem("accessToken", result.token);
+                        console.log('Токен успешно обновлен:', result);
+                        return true;
+                    } catch (error) {
+                        console.error('Ошибка:', error.message);
+                        return false;
+                    }
+                },
+
+                async checkRefreshToken() {
+                    try {
+                        const formData = new FormData();
+                        formData.append("Device", "Web");
+
+                        const response = await fetch('https://localhost:7207/api/auth/refresh', {
+                            method: 'POST',
+                            credentials: 'include', // Важно для передачи кук
+                            body: formData,
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            localStorage.setItem("accessToken", result.accessToken); // Сохраняем новый Access Token
+                            window.location.href = "/home"; // Перенаправляем на домашнюю страницу
+                        } else {
+                            const errorData = await response.json(); // Попытка получить сообщение об ошибке
+                            console.log(errorData.message || "Refresh token недействителен или отсутствует.");
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при проверке refresh token:', error.message);
+                    }
+                }
+            },
+            mounted() {
+                this.checkRefreshToken();
+            }
+        }).mount('#app');
+
+        function generateCaptcha() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let result = "";
+            for (let i = 0; i < 5; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+    </script>
+}
