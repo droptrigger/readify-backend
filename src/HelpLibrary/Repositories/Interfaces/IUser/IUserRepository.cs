@@ -45,5 +45,7 @@ namespace ServerLibrary.Repositories.Interfaces.IUser
         /// </summary>
         /// <param name="user">Объект класса User</param>
         Task RemoveFromDatabaseAsync(User user);
+
+        Task SaveChangesAsync();
     }
 }

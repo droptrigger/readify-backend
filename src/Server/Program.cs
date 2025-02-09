@@ -24,6 +24,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 
+// Для веба
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins("http://localhost:5013", "https://localhost:7197") // Укажите адрес фронтенда
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Добавьте эту строку
+    });
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     // Добавляем поддержку JWT
@@ -99,6 +111,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Для веба
+app.UseCors("AllowAll");
+
+app.UseStaticFiles();
 app.UseFileServer();
 app.UseHttpsRedirection();
 

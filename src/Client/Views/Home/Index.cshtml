@@ -1,0 +1,20 @@
+﻿<h1>Home</h1>
+
+@section scripts {
+
+    <script src="~/lib//vue//vue.global.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!isAuthenticated()) {
+                window.location.href = "/auth/login";
+            }
+        });
+
+        function isAuthenticated() {
+            const accessToken = localStorage.getItem("accessToken");
+            return !!accessToken;
+        }
+    </script>
+
+}

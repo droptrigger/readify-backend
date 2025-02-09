@@ -18,10 +18,18 @@ namespace Server.Controllers
             _userService = userService;
         }
 
-        [HttpPut("/user/update")]
+        [HttpPut("/api/user/update")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDTO user)
         {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id");
+            Console.WriteLine(userIdClaim);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return BadRequest("Не удалось определить ID пользователя.");
+            }
+
+            user.UserId = userId;
             if (user == null) return BadRequest("Model is empty");
 
             try

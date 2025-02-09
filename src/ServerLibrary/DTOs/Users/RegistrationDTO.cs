@@ -12,8 +12,7 @@ namespace HelpLibrary.DTOs.Users
 
         [MinLength(2, ErrorMessage = "Минимальное количество символов: 2")]
         [MaxLength(100, ErrorMessage = "Максимальное количество символов: 100")]
-        [Required]
-        public string Name { get; set; } = null!;
+        public string? Name { get; set; } = null!;
 
         [DataType(DataType.EmailAddress)]
         [MaxLength(150, ErrorMessage = "Максимальное количество символов: 150")]

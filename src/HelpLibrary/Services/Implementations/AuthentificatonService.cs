@@ -68,11 +68,16 @@ namespace ServerLibrary.Services.Implementations
             User addUser = await _userRepository.AddToDatabaseAsync(new User()
             {
                 Nickname = user.Nickname!.ToLower(),
-                Name = user.Name.ToLower(),
                 Email = user.Email!.ToLower(),
                 PasswordHash = hashPassword,
                 CreatedAt = DateTime.UtcNow,
+                Name = user.Name != null ? user.Name : "Пользователь"
             });
+
+            if (user.Name is null)
+                addUser.Name = "Пользователь" + addUser.Id;
+
+            await _userRepository.SaveChangesAsync();
 
             await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = addUser.Id, Action = Constants.Register });
 
@@ -87,13 +92,13 @@ namespace ServerLibrary.Services.Implementations
             if (checkUser is null)
             {
                 checkUser = await _userRepository.FindByNicknameAsync(user.EmailOrNickname!.ToLower());
-                if (checkUser is null) throw new NotFoundUserException("There is no account with this email or nickname.");
+                if (checkUser is null) throw new NotFoundUserException("Неверное имя пользователя или пароль.");
             }
 
             var hashPassword = new PasswordHasher<object>().HashPassword(null!, user.Password!);
 
             var checkPass = new PasswordHasher<object>().VerifyHashedPassword(null!, checkUser.PasswordHash, user.Password!);
-            if (checkPass != PasswordVerificationResult.Success) throw new InvalidPasswordException("Invalid password");
+            if (checkPass != PasswordVerificationResult.Success) throw new InvalidPasswordException("Неверное имя пользователя или пароль");
 
             string token = await GenerateTokenAsync(checkUser, user.Device!.ToLower());
             string refreshToken = GenerateRefreshToken();
@@ -104,8 +109,8 @@ namespace ServerLibrary.Services.Implementations
 
             if (checkSession is not null)
             {
-                await _refreshRepository.UpdateRefreshAsync(checkSession, refreshToken);
-                return new LoginResponce("Success!", token, refreshToken);
+                var result = await RefreshToken(checkSession.RefreshTokenHash);
+                return result;
             }
             else
             {
@@ -185,7 +190,7 @@ namespace ServerLibrary.Services.Implementations
                 return new LoginResponce("Token refreshed successfully", jwtToken, newRefreshToken);
             }
 
-            return new LoginResponce("Token refreshed successfully", jwtToken);
+            return new LoginResponce("Token refreshed successfully", jwtToken, findToken.RefreshTokenHash);
         }
 
         public async Task<GeneralResponce> LogOut(string refreshToken)
@@ -206,7 +211,7 @@ namespace ServerLibrary.Services.Implementations
             if (model is not null) await _mailRepository.DeleteCodeAsync(model);
 
             string code = GenerateCode();
-            await _mailRepository.WriteCodeAsync(new ConfirmCode
+            var sendMail = await _mailRepository.WriteCodeAsync(new ConfirmCode
             {
                 Email = email,
                 Code = code,
@@ -238,6 +243,7 @@ namespace ServerLibrary.Services.Implementations
             }
             catch (Exception ex)
             {
+                await _mailRepository.DeleteCodeAsync(sendMail);
                 throw new Exception(ex.Message);
             }
         }
@@ -247,6 +253,29 @@ namespace ServerLibrary.Services.Implementations
             Random random = new Random();
             int number = random.Next(1, 999999);
             return number.ToString("D6");
+        }
+
+        public async Task<bool> CheckUsernameAsync(string userneme)
+        {
+            var result = await _userRepository.FindByNicknameAsync(userneme);
+
+            if (result is null)
+                return false;
+
+            else
+                return true;
+            
+        }
+
+        public async Task<bool> CheckEmailAsync(string email)
+        {
+            var result = await _userRepository.FindByEmailAsync(email);
+
+            if (result is null)
+                return false;
+
+            else
+                return true;
         }
     }
 }

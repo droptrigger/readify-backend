@@ -39,5 +39,9 @@ namespace ServerLibrary.Services.Interfaces
         /// <param name="email">Email получателя</param>
         /// <returns>Ответ сервера</returns>
         Task<GeneralResponce> SendRegisterEmailCodeAsync(string email);
+
+        Task<bool> CheckUsernameAsync(string userneme);
+
+        Task<bool> CheckEmailAsync(string email);
     }
 }

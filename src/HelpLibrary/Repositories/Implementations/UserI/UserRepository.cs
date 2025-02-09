@@ -62,5 +62,10 @@ namespace ServerLibrary.Repositories.Implementations.UserI
             await _context.SaveChangesAsync();
             return findUser;
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }
