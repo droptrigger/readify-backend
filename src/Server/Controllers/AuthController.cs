@@ -79,11 +79,6 @@ namespace Server.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromForm] RefreshDTO refreshToken)
         {
-            // Логирование для отладки
-            Console.WriteLine($"Cookies in request: {string.Join(", ", Request.Cookies.Keys)}");
-            Console.WriteLine($"Refresh Token from cookies: {Request.Cookies["refreshToken"]}");
-
-            // Получение куки из запроса
             refreshToken.refreshToken = Request.Cookies["refreshToken"];
 
             if (string.IsNullOrEmpty(refreshToken?.refreshToken))
@@ -94,17 +89,6 @@ namespace Server.Controllers
             try
             {
                 var result = await _authService.RefreshToken(refreshToken.refreshToken!);
-
-                // Обновление куки для веб-клиентов
-                if (refreshToken.Device?.ToLower() == "web")
-                {
-                    Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Expires = DateTimeOffset.UtcNow.AddDays(150),
-                        Secure = false
-                    });
-                }
 
                 return Ok(result);
             }

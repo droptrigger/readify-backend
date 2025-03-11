@@ -131,8 +131,6 @@ namespace ServerLibrary.Services.Implementations
 
         private async Task<string> GenerateTokenAsync(User user, string device)
         {
-            Console.WriteLine(_config.Value.SecretKey);
-
             var claims = new List<Claim>() 
             {
                 new Claim("id", user.Id.ToString()),

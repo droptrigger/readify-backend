@@ -1,20 +1,52 @@
-﻿<h1>Home</h1>
+﻿<div id="app">
+    <h1>Home</h1>
+</div>
 
 @section scripts {
-
-    <script src="~/lib//vue//vue.global.js"></script>
-
+    <script src="~/lib/vue/vue.global.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            if (!isAuthenticated()) {
-                window.location.href = "/auth/login";
+        const { createApp } = Vue;
+
+        createApp({
+            methods: {
+                async checkRefreshToken() {
+                    try {
+                        const formData = new FormData();
+                        formData.append("Device", "Web");
+
+                        const response = await fetch('https://localhost:7207/api/auth/refresh', {
+                            method: 'POST',
+                            credentials: 'include',
+                            body: formData,
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            localStorage.setItem("accessToken", result.token);
+                            console.log("Токен успешно обновлен");
+                        } else {
+                            const errorData = await response.json();
+                            console.error(errorData.message || "Refresh token недействителен или отсутствует.");
+                            window.location.href = "/auth/login"; 
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при проверке refresh token:', error.message);
+                        window.location.href = "/auth/login";
+                    }
+                },
+
+                isAuthenticated() {
+                    const accessToken = localStorage.getItem("accessToken");
+                    if (!accessToken || accessToken == "undefined") {
+                        this.checkRefreshToken();
+                    } else {
+                        console.log("Пользователь аутентифицирован");
+                    }
+                }
+            },
+            mounted() {
+                this.isAuthenticated();
             }
-        });
-
-        function isAuthenticated() {
-            const accessToken = localStorage.getItem("accessToken");
-            return !!accessToken;
-        }
+        }).mount('#app');
     </script>
-
 }

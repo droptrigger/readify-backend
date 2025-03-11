@@ -90,16 +90,16 @@
 
                         const response = await fetch('https://localhost:7207/api/auth/refresh', {
                             method: 'POST',
-                            credentials: 'include', // Важно для передачи кук
+                            credentials: 'include',
                             body: formData,
                         });
 
                         if (response.ok) {
                             const result = await response.json();
-                            localStorage.setItem("accessToken", result.accessToken); // Сохраняем новый Access Token
-                            window.location.href = "/home"; // Перенаправляем на домашнюю страницу
+                            localStorage.setItem("accessToken", result.accessToken);
+                            window.location.href = "/home";
                         } else {
-                            const errorData = await response.json(); // Попытка получить сообщение об ошибке
+                            const errorData = await response.json();
                             console.log(errorData.message || "Refresh token недействителен или отсутствует.");
                         }
                     } catch (error) {
