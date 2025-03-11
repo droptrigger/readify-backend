@@ -1,2 +1,2 @@
 # readify-backend
-the repository for the course project
+the server repository for the course project
