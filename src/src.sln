@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerLibrary", "HelpLibrary\ServerLibrary.csproj", "{0907425C-0EBA-4508-918D-A317D5BED1E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpLibrary", "HelpLibrary\HelpLibrary.csproj", "{0907425C-0EBA-4508-918D-A317D5BED1E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpLibrary", "ServerLibrary\HelpLibrary.csproj", "{05E70784-5379-4FF1-A042-04BC49CF2A04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerLibrary", "ServerLibrary\ServerLibrary.csproj", "{05E70784-5379-4FF1-A042-04BC49CF2A04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{8187F362-453E-4536-9F0B-6E219F71A09A}"
 EndProject

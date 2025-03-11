@@ -23,7 +23,6 @@ namespace Server.Controllers
         public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDTO user)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id");
-            Console.WriteLine(userIdClaim);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
                 return BadRequest("Не удалось определить ID пользователя.");
