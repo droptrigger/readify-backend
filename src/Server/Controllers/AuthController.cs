@@ -18,7 +18,7 @@ namespace Server.Controllers
             _authService = authService;
         }
 
-        [HttpPost("register")]
+        [HttpPost("/api/auth/register")]
         public async Task<IActionResult> Register(RegistrationDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
@@ -34,7 +34,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("send-mail")]
+        [HttpPost("/api/auth/send-mail")]
         public async Task<IActionResult> SendMail([FromBody] string email)
         {
             if (email == null) return BadRequest("Model is empty");
@@ -49,7 +49,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("login")]
+        [HttpPost("/api/auth/login")]
         public async Task<IActionResult> Login([FromForm] LoginDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
@@ -76,8 +76,8 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromForm] RefreshDTO refreshToken)
+        [HttpPost("/api/auth/refresh")]
+        public async Task<IActionResult> Refresh([FromForm] RefreshDTO refreshToken = null!)
         {
             refreshToken.refreshToken = Request.Cookies["refreshToken"];
 
@@ -98,7 +98,23 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("logout")]
+        [HttpGet("/api/auth/user")]
+        public async Task<IActionResult> GetUser(string emailOrUsername)
+        {
+            if (emailOrUsername is null) return BadRequest("Model is empty");
+            try
+            {
+                var result = await _authService.GetUserByEmailOrUsernameAsync(emailOrUsername);
+                return Ok(result);
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpPost("/api/auth/logout")]
         [Authorize]
         public async Task<IActionResult> LogOut([FromForm] string refreshToken)
         {
@@ -114,7 +130,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("checkusername")]
+        [HttpPost("/api/auth/checkusername")]
         public async Task<IActionResult> CheckUsername([FromForm] string username)
         {
             if (username == null) return BadRequest("Model is empty");
@@ -130,7 +146,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("checkemail")]
+        [HttpPost("/api/auth/checkemail")]
         public async Task<IActionResult> CheckEmail([FromForm] string email)
         {
             if (email == null) return BadRequest("Model is empty");

@@ -11,6 +11,7 @@ using ServerLibrary.Helpers.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using HelpLibrary.DTOs.Subscribe;
 using ServerLibrary.Repositories.Interfaces.IUser;
+using ServerLibrary.Helpers.Converters;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -34,6 +35,13 @@ namespace ServerLibrary.Services.Implementations
         public async Task<List<UserInfoDTO>> GetAllSubscriptionsAsync(int idUser) =>
             await _subscribeRepository.GetSubscriptionsByIdAsync(idUser);
         
+
+        public async Task<UserDTO> GetUserDTO(int id)
+        {
+            var user = await _userRepository.FindByIdAsync(id);
+
+            return await ConvertToUserDTO.Convert(user);
+        }
 
         public async Task<GeneralResponce> SubscribeAsync(SubscribeDTO subscribe)
         {

@@ -91,7 +91,7 @@ public partial class ReadifyContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Books_Users");
 
-            entity.HasOne(d => d.IdCategoryNavigation).WithMany(p => p.Books)
+            entity.HasOne(d => d.IdGenreNavigation).WithMany(p => p.Books)
                 .HasForeignKey(d => d.IdGenre)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Books_Categories");

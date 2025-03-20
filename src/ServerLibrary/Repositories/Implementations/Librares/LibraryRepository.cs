@@ -21,7 +21,7 @@ namespace ServerLibrary.Repositories.Implementations.Librares
             return result.Entity;
         }
 
-        public async Task<Library> FindLibraryByIdUserIdBookAsync(LibraryDTO library) =>
+        public async Task<Library> FindLibraryByIdUserIdBookAsync(AddLibraryDTO library) =>
             await _context.Libraries.FirstOrDefaultAsync(l => l.IdUser == library.idUser && l.IdBook == library.idBook);
 
         public async Task<List<Book>> GetAllBooksFromLibraryAsync(int idUser) =>
@@ -40,7 +40,7 @@ namespace ServerLibrary.Repositories.Implementations.Librares
 
         public async Task<Library> UpdateProgressAsync(UpdateProgressDTO update)
         {
-            var library = await FindLibraryByIdUserIdBookAsync(new LibraryDTO { idBook = update.IdBook, idUser = update.IdUser });
+            var library = await FindLibraryByIdUserIdBookAsync(new AddLibraryDTO { idBook = update.IdBook, idUser = update.IdUser });
             library.ProgressPage = update.NewPage;
             await _context.SaveChangesAsync();
             return library;

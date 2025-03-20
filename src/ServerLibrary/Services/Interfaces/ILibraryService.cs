@@ -11,12 +11,12 @@ namespace ServerLibrary.Services.Interfaces
 {
     public interface ILibraryService
     {
-        Task<GeneralResponce> AddBookToLibraryAsync(LibraryDTO library);
-        Task<GeneralResponce> DeleteBookFromLibraryAsync(LibraryDTO library);
+        Task<GeneralResponce> AddBookToLibraryAsync(AddLibraryDTO library);
+        Task<GeneralResponce> DeleteBookFromLibraryAsync(AddLibraryDTO library);
         Task<GeneralResponce> UpdateProgressPagesAsync(UpdateProgressDTO update);
         Task<List<Book>> GetAllBooksUserAsync(int id);
 
-        Task<GeneralResponce> AddBokmarkAsync(BookmarkDTO addBookmark);
+        Task<GeneralResponce> AddBokmarkAsync(AddBookmarkDTO addBookmark);
         Task<List<Bookmark>> GetAllBookmarksLibraryAsync(int idLibrary);
         Task<GeneralResponce> UpdateBookmarkAsync(UpdateBookmarkDTO update);
         Task<GeneralResponce> DeleteBookmarkAsync(int idBookmark);

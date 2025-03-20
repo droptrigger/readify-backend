@@ -14,6 +14,8 @@ namespace ServerLibrary.Services.Interfaces
         /// <returns>Объект класса UpdateUserResponce, содержащий обновленные данные</returns>
         Task<UpdateUserResponce> UpdateUserAsync(UpdateUserDTO user);
 
+        Task<UserDTO> GetUserDTO(int id);
+
         /// <summary>
         /// Метод удаления пользователя
         /// </summary>

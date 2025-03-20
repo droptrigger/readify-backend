@@ -29,7 +29,7 @@ public partial class Book
 
     public virtual User IdAuthorNavigation { get; set; } = null!;
 
-    public virtual Genre IdCategoryNavigation { get; set; } = null!;
+    public virtual Genre IdGenreNavigation { get; set; } = null!;
 
     public virtual ICollection<Library> Libraries { get; set; } = new List<Library>();
 }

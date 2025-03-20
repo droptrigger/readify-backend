@@ -41,7 +41,13 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\books\files\" />
     <Folder Include="wwwroot\images\books\covers\" />
-    <Folder Include="wwwroot\images\users\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\images\users\default-avatar.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

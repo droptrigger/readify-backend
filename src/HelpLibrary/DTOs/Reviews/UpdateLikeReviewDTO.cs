@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HelpLibrary.DTOs.Books
+namespace HelpLibrary.DTOs.Reviews
 {
     public class UpdateLikeReviewDTO
     {

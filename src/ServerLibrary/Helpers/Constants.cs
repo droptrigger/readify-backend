@@ -9,35 +9,37 @@
             { 2, "admin" }
         };
 
-        public static string? Register { get; } = "Registration";
-        public static string? Login { get; } = "Login";
-        public static string? Update { get; } = "Update";
-        public static string? Refresh { get; } = "Refresh";
-        public static string? GenerateToken { get; } = "Generate token";
+        public const string? Register = "Registration";
+        public const string? Login = "Login";
+        public const string? Update = "Update";
+        public const string? Refresh = "Refresh";
+        public const string? GenerateToken = "Generate token";
 
-        public static string? Subscribe { get; } = "Subscribe on ";
-        public static string? UnSubscribe { get; } = "Unsubscribe by ";
+        public const string? Subscribe = "Subscribe on ";
+        public const string? UnSubscribe = "Unsubscribe by ";
 
-        public static string? DeleteUser { get; } = "Was deleted";
-        public static string? Ban { get; } = "Was banned";
-        public static string? Unban { get; } = "Was unblocked";
+        public const string? DeleteUser = "Was deleted";
+        public const string? Ban = "Was banned";
+        public const string? Unban = "Was unblocked";
 
-        public static string? AddLibrary { get; } = "Added a book to the library. Book id: ";
-        public static string? DeleteLibrary { get; } = "Deleted a book to the library. Book id: ";
+        public const string? AddLibrary = "Added a book to the library. Book id: ";
+        public const string? DeleteLibrary = "Deleted a book to the library. Book id: ";
 
-        public static string? PathBookFiles { get; } = @"images\books\files\";
-        public static string? PathBookImages { get; } = @"images\books\covers\";
+        public const string? PathBookFiles = @"images\books\files\";
+        public const string? PathBookImages = @"images\books\covers\";
+        public const string? PathToBookImagesForBytes = @"..\Server\wwwroot\";
 
-        public static string? PathToBookFiles { get; } = @"..\Server\wwwroot\images\books\files\";
-        public static string? PathToBookImages { get; } = @"..\Server\wwwroot\images\books\covers\";
+        public const string? PathToBookFiles = @"..\Server\wwwroot\images\books\files\";
+        public const string? PathToBookImages = @"..\Server\wwwroot\images\books\covers\";
 
-        public static string? PathUserImages { get; } = @"images\users\"; 
-        public static string? PathToUserAvatar { get; } = @"..\Server\wwwroot\images\users\";
+        public const string? PathUserImages = @"images\users\"; 
+        public const string? PathToUserAvatar = @"..\Server\wwwroot\images\users\";
+        public const string? PathToUserAvatarForBytes = @"..\Server\wwwroot\";
 
-        public static string? DefaultAvatar { get; } = @"images\users\default-cover.png";
-        public static string? DefaultBookImage { get; } = @"images\books\covers\default-avatar.png";
+        public static string DefaultAvatar { get; } = @"images\users\default-cover.png";
+        public const string? DefaultBookImage = @"images\books\covers\default-avatar.png";
 
-        public static string? HtmlMailTemplate { get; } = @"
+        public const string? HtmlMailTemplate = @"
                                             <!DOCTYPE html>
                                             <html lang=""en"">
                                             <head>

@@ -26,7 +26,7 @@ namespace ServerLibrary.Services.Implementations
             _bookmarksRepository = bookmarksRepository;
         }
 
-        public async Task<GeneralResponce> AddBokmarkAsync(BookmarkDTO addBookmark)
+        public async Task<GeneralResponce> AddBokmarkAsync(AddBookmarkDTO addBookmark)
         {
             if (addBookmark is null) throw new NullReferenceException("Model is empty");
 
@@ -44,7 +44,7 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task<GeneralResponce> AddBookToLibraryAsync(LibraryDTO library)
+        public async Task<GeneralResponce> AddBookToLibraryAsync(AddLibraryDTO library)
         {
             if (library is null) throw new NullReferenceException("Model is empty");
 
@@ -67,7 +67,7 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task<GeneralResponce> DeleteBookFromLibraryAsync(LibraryDTO library)
+        public async Task<GeneralResponce> DeleteBookFromLibraryAsync(AddLibraryDTO library)
         {
             if (library is null) throw new NullReferenceException("Model is empty");
 
@@ -109,7 +109,7 @@ namespace ServerLibrary.Services.Implementations
         {
             if (update is null) throw new NullReferenceException("Model is empty");
 
-            var findLibrary = await _libraryRepository.FindLibraryByIdUserIdBookAsync(new LibraryDTO { idBook = update.IdBook, idUser = update.IdUser });
+            var findLibrary = await _libraryRepository.FindLibraryByIdUserIdBookAsync(new AddLibraryDTO { idBook = update.IdBook, idUser = update.IdUser });
             if (findLibrary is null) throw new Exception("I did not find such an entry.");
 
             var result = await _libraryRepository.UpdateProgressAsync(update);

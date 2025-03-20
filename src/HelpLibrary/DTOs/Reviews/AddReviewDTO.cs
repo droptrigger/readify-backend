@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HelpLibrary.DTOs.Books
+namespace HelpLibrary.DTOs.Reviews
 {
     public class AddReviewDTO
     {
