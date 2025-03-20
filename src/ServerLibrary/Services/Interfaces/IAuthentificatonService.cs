@@ -1,4 +1,5 @@
 ﻿using HelpLibrary.DTOs.Users;
+using HelpLibrary.Entities;
 using HelpLibrary.Responces;
 
 namespace ServerLibrary.Services.Interfaces
@@ -10,7 +11,7 @@ namespace ServerLibrary.Services.Interfaces
         /// </summary>
         /// <param name="user">Объект передачи данных, содержащий информацию, необходимю для регистрации</param>
         /// <returns>Ответ сервера, содержащий сообщение об удачной регистрации</returns>
-        Task<GeneralResponce> RegisterUserAsync(RegistrationDTO user);
+        Task<UserDTO> RegisterUserAsync(RegistrationDTO user);
 
         /// <summary>
         /// Метод для входа в аккаунт
@@ -39,6 +40,13 @@ namespace ServerLibrary.Services.Interfaces
         /// <param name="email">Email получателя</param>
         /// <returns>Ответ сервера</returns>
         Task<GeneralResponce> SendRegisterEmailCodeAsync(string email);
+
+        /// <summary>
+        /// Метод получения пользователя
+        /// </summary>
+        /// <param name="emailOrUsername"></param>
+        /// <returns></returns>
+        Task<User> GetUserByEmailOrUsernameAsync(string emailOrUsername);
 
         Task<bool> CheckUsernameAsync(string userneme);
 

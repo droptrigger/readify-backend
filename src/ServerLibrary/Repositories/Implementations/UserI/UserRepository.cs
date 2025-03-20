@@ -23,13 +23,30 @@ namespace ServerLibrary.Repositories.Implementations.UserI
             return result.Entity;
         }
 
-        public async Task<User> FindByEmailAsync(string email) =>
+        public async Task<User?> FindByEmailAsync(string email) =>
             await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-        public async Task<User> FindByIdAsync(int id) =>
-             await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        public async Task<User?> FindByIdAsync(int id) =>
+            await _context.Users
+                .Include(u => u.Books)
+                    .ThenInclude(b => b.IdGenreNavigation)
+                .Include(u => u.Libraries)
+                    .ThenInclude(l => l.IdBookNavigation)
+                        .ThenInclude(b => b.IdGenreNavigation)
+                .Include(u => u.Libraries)
+                    .ThenInclude(l => l.Bookmarks)
+                .Include(u => u.UserSubscriberIdAuthorNavigations)
+                    .ThenInclude(us => us.IdSubscriberNavigation)
+                .Include(u => u.UserSubscriberIdSubscriberNavigations)
+                    .ThenInclude(us => us.IdAuthorNavigation)
+                .Include(u => u.BookReviews)
+                    .ThenInclude(r => r.IdBookNavigation)
+                .Include(u => u.BookReviews)
+                    .ThenInclude(l => l.LikesReviews)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(u => u.Id == id);
 
-        public async Task<User> FindByNicknameAsync(string nickname) =>
+        public async Task<User?> FindByNicknameAsync(string nickname) =>
              await _context.Users.FirstOrDefaultAsync(u => u.Nickname == nickname);
 
         public async Task RemoveFromDatabaseAsync(User user)
@@ -54,13 +71,13 @@ namespace ServerLibrary.Repositories.Implementations.UserI
         {
             var findUser = await FindByIdAsync(updateUser.UserId);
 
-            if (updateUser.Nickname is not null) findUser.Nickname = updateUser.Nickname!;
-            if (updateUser.Description is not null) findUser.Description = updateUser.Description;
-            if (updateUser.Name is not null) findUser.Name = updateUser.Name!;
-            if (updateUser.Password is not null) findUser.PasswordHash = new PasswordHasher<object>().HashPassword(null!, updateUser.Password!);
+            if (updateUser.Nickname is not null) findUser!.Nickname = updateUser.Nickname!;
+            if (updateUser.Description is not null) findUser!.Description = updateUser.Description;
+            if (updateUser.Name is not null) findUser!.Name = updateUser.Name!;
+            if (updateUser.Password is not null) findUser!.PasswordHash = new PasswordHasher<object>().HashPassword(null!, updateUser.Password!);
 
             await _context.SaveChangesAsync();
-            return findUser;
+            return findUser!;
         }
 
         public async Task SaveChangesAsync()

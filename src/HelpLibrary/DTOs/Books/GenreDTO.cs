@@ -1,13 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace HelpLibrary.DTOs.Books
+﻿namespace HelpLibrary.DTOs.Books
 {
     public class GenreDTO
     {
-        [Required]
-        public int id { get; set; }
+        /// <summary>
+        /// Id жанра
+        /// </summary>
+        public int Id { get; set; }
         
-        [Required]
-        public string newName { get; set; } = null!;
+        /// <summary>
+        /// Название жанра
+        /// </summary>
+        public string? Name { get; set; }
     }
 }

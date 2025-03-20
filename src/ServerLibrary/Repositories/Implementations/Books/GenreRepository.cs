@@ -44,8 +44,8 @@ namespace ServerLibrary.Repositories.Implementations.Books
 
         public async Task<Genre> UpdateGenreAsync(GenreDTO genre)
         {
-            var findGenre = await FindGenreByIdAsync(genre.id);
-            findGenre.Name = genre.newName.ToLower();
+            var findGenre = await FindGenreByIdAsync(genre.Id);
+            findGenre.Name = genre.Name.ToLower();
             await _context.SaveChangesAsync();
             return findGenre;
         }

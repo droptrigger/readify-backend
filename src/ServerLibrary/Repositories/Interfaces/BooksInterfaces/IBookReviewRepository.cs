@@ -1,4 +1,4 @@
-﻿using HelpLibrary.DTOs.Books;
+﻿using HelpLibrary.DTOs.Reviews;
 using HelpLibrary.Entities;
 
 namespace ServerLibrary.Repositories.Interfaces.BooksInterfaces

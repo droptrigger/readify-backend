@@ -42,7 +42,15 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("/user/subscribe")]
+        [HttpGet("/api/user/{id}")]
+        public async Task<IActionResult> GetUser(int id)
+        {
+            var userDTO = await _userService.GetUserDTO(id);
+
+            return Ok(userDTO);
+        } 
+
+        [HttpPost("/api/user/subscribe")]
         public async Task<IActionResult> Subscribe([FromForm] SubscribeDTO sub)
         {
             if (sub == null) return BadRequest("Model is empty");
@@ -58,7 +66,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("/user/unsubscribe")]
+        [HttpPost("/api/user/unsubscribe")]
         public async Task<IActionResult> UnSubscribe([FromForm] SubscribeDTO unsub)
         {
             if (unsub == null) return BadRequest("Model is empty");
@@ -74,7 +82,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("/user/subscribers")]
+        [HttpGet("/api/user/subscribers")]
         public async Task<IActionResult> GetSubscribers(int id)
         {
             try
@@ -88,7 +96,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("/user/subscriptions")]
+        [HttpGet("/api/user/subscriptions")]
         public async Task<IActionResult> GetSubscriptions(int id)
         {
             try

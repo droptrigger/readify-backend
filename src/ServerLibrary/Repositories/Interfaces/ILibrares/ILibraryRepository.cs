@@ -38,6 +38,6 @@ namespace ServerLibrary.Repositories.Interfaces.ILibrares
         /// </summary>
         /// <param name="library">Объект передачи данных, содержащий идентификаторы</param>
         /// <returns>Найденный объект</returns>
-        Task<Library> FindLibraryByIdUserIdBookAsync(LibraryDTO library);
+        Task<Library> FindLibraryByIdUserIdBookAsync(AddLibraryDTO library);
     }
 }

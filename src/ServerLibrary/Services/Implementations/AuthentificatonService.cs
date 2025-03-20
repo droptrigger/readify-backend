@@ -18,6 +18,8 @@ using System.Net.Mail;
 using System.Net;
 using HelpLibrary.DTOs.Mail;
 using ServerLibrary.Repositories.Interfaces.IUser;
+using HelpLibrary.DTOs.Library;
+using ServerLibrary.Helpers.Converters;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -43,22 +45,22 @@ namespace ServerLibrary.Services.Implementations
             _mailRepository = mailRepository;
         }
 
-        public async Task<GeneralResponce> RegisterUserAsync(RegistrationDTO user)
+        public async Task<UserDTO> RegisterUserAsync(RegistrationDTO user)
         {
-            if (user == null) throw new NullReferenceException("Model is empty");
+            if (user == null) throw new NullReferenceException("Заполнены не все данные");
 
             var checkUser = await _userRepository.FindByEmailAsync(user.Email!.ToLower());
-            if (checkUser != null) throw new EmailIsBusyException("The user is already registered");
+            if (checkUser != null) throw new EmailIsBusyException("Пользователь с таким email уже существует");
 
             checkUser = await _userRepository.FindByNicknameAsync(user.Nickname!.ToLower());
-            if (checkUser != null) throw new NicknameIsBusyException("The user is already registered");
+            if (checkUser != null) throw new NicknameIsBusyException("Никнейм уже занят");
 
             var code = await _mailRepository.VerifyCodeAsync(new ConfirmCode { Code = user.Code, Email = user.Email });
-            if (code == null) throw new InvalidCodeException("The code has is incorrect");
+            if (code == null) throw new InvalidCodeException("Код не верный");
             if (code.ExpiresIn < DateTime.UtcNow)
             {
                 await _mailRepository.DeleteCodeAsync(code);
-                throw new InvalidCodeException("The code has expired");
+                throw new InvalidCodeException("Срок действия кода истек");
             }
 
             await _mailRepository.DeleteCodeAsync(code);
@@ -81,7 +83,8 @@ namespace ServerLibrary.Services.Implementations
 
             await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = addUser.Id, Action = Constants.Register });
 
-            return new GeneralResponce("You have successfully registered"); 
+            return await ConvertToUserDTO.Convert(addUser);
+
         }
 
         public async Task<LoginResponce> SignInAsync(LoginDTO user)
@@ -274,6 +277,28 @@ namespace ServerLibrary.Services.Implementations
 
             else
                 return true;
+        }
+
+        /// <summary>
+        /// Метод получения пользователя по email или имени пользователя
+        /// </summary>
+        /// <param name="emailOrUsername">Email или имя пользователя</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task<User> GetUserByEmailOrUsernameAsync(string emailOrUsername)
+        {
+            if (emailOrUsername is null) throw new Exception();
+
+            var result = await _userRepository.FindByEmailAsync(emailOrUsername);
+
+            if (result is null)
+            {
+                result = await _userRepository.FindByNicknameAsync(emailOrUsername);
+                if (result is null)
+                    throw new Exception();
+            }
+
+            return result;
         }
     }
 }

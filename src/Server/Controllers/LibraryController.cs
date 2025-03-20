@@ -21,7 +21,7 @@ namespace Server.Controllers
 
         [HttpPost("/library")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddLibrary([FromForm] LibraryDTO library)
+        public async Task<IActionResult> AddLibrary([FromForm] AddLibraryDTO library)
         {
             if (library == null) return BadRequest("Model is empty");
 
@@ -38,7 +38,7 @@ namespace Server.Controllers
         
         [HttpDelete("/library")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> DeleteLibrary([FromForm] LibraryDTO library)
+        public async Task<IActionResult> DeleteLibrary([FromForm] AddLibraryDTO library)
         {
             if (library == null) return BadRequest("Model is empty");
 
@@ -89,7 +89,7 @@ namespace Server.Controllers
 
         [HttpPost("/library/bookmarks")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateBookmark([FromForm] BookmarkDTO bookmark)
+        public async Task<IActionResult> CreateBookmark([FromForm] AddBookmarkDTO bookmark)
         {
             if (bookmark is null) return BadRequest("Model is empty");
 

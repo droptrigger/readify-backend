@@ -1,4 +1,5 @@
 ﻿using HelpLibrary.DTOs.Books;
+using HelpLibrary.DTOs.Reviews;
 using HelpLibrary.Entities;
 using HelpLibrary.Responces;
 using Microsoft.AspNetCore.Http;
@@ -201,12 +202,12 @@ namespace ServerLibrary.Services.Implementations
 
         public async Task<GeneralResponce> UpdateGenreAsync(GenreDTO genre)
         {
-            var tryFound = await _genreRepository.FindGenreByIdAsync(genre.id);
-            if (tryFound is null) throw new NotFoundException($"Not found genre id {genre.id}");
+            var tryFound = await _genreRepository.FindGenreByIdAsync(genre.Id);
+            if (tryFound is null) throw new NotFoundException($"Not found genre id {genre.Id}");
 
             await _genreRepository.UpdateGenreAsync(genre);
 
-            return new GeneralResponce($"A genre id {genre.id} has been updated, new name {genre.newName}");
+            return new GeneralResponce($"A genre id {genre.Id} has been updated, new name {genre.Name}");
         }
 
         public async Task<GeneralResponce> UpdateLikeAsync(UpdateLikeReviewDTO updateLike)
@@ -249,7 +250,7 @@ namespace ServerLibrary.Services.Implementations
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await image.CopyToAsync(stream);
-                    book.FileBookPath = Constants.PathBookImages + fileName;
+                    book.CoverImagePath = Constants.PathBookImages + fileName;
                     return filePath;
                 }
             }
