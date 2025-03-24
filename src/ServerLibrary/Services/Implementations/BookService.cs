@@ -183,7 +183,7 @@ namespace ServerLibrary.Services.Implementations
         {
             if (book is null) throw new NullReferenceException("Model is empty");
 
-            var foundBook = _bookRepository.FindBookByIdAsync(book.Id);
+            var foundBook = await _bookRepository.FindBookByIdAsync(book.Id);
             if (foundBook is null) throw new Exception($"{book.Id} is not found");
 
             await _bookRepository.UpdateBookAsync(book);

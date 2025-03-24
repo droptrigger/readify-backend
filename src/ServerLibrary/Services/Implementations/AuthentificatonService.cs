@@ -128,7 +128,7 @@ namespace ServerLibrary.Services.Implementations
                     }
                 );
 
-                return new LoginResponce("Success!", token, refreshToken);
+                return new LoginResponce("Success!", token, refreshToken, await ConvertToUserDTO.Convert(checkUser!));
             }
         }
 
@@ -191,7 +191,7 @@ namespace ServerLibrary.Services.Implementations
                 return new LoginResponce("Token refreshed successfully", jwtToken, newRefreshToken);
             }
 
-            return new LoginResponce("Token refreshed successfully", jwtToken, findToken.RefreshTokenHash);
+            return new LoginResponce("Token refreshed successfully", jwtToken, findToken.RefreshTokenHash, await ConvertToUserDTO.Convert(user!));
         }
 
         public async Task<GeneralResponce> LogOut(string refreshToken)

@@ -19,9 +19,10 @@ namespace Server.Controllers
         }
 
         [HttpPut("/api/user/update")]
-        [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDTO user)
         {
+            Console.WriteLine("!        " +user.AvatarImage);
+
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id");
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
