@@ -10,7 +10,7 @@ namespace HelpLibrary.DTOs.Users
         [Required]
         public string? Nickname { get; set; }
 
-        [MinLength(2, ErrorMessage = "Минимальное количество символов: 2")]
+
         [MaxLength(100, ErrorMessage = "Максимальное количество символов: 100")]
         public string? Name { get; set; } = null!;
 

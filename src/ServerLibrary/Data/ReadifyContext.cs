@@ -239,7 +239,7 @@ public partial class ReadifyContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.Description)
-                .HasMaxLength(150)
+                .HasMaxLength(250)
                 .HasColumnName("description");
             entity.Property(e => e.Email)
                 .HasMaxLength(150)
