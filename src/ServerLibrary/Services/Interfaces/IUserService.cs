@@ -12,7 +12,7 @@ namespace ServerLibrary.Services.Interfaces
         /// </summary>
         /// <param name="user">Объект передачи данных, который содержит обновленную информацию о пользователе</param>
         /// <returns>Объект класса UpdateUserResponce, содержащий обновленные данные</returns>
-        Task<UpdateUserResponce> UpdateUserAsync(UpdateUserDTO user);
+        Task<UserDTO> UpdateUserAsync(UpdateUserDTO user);
 
         Task<UserDTO> GetUserDTO(int id);
 

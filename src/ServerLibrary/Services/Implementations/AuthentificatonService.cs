@@ -229,7 +229,7 @@ namespace ServerLibrary.Services.Implementations
                 message.IsBodyHtml = true;
                 message.From = new MailAddress(smtpUsername, "Readify");
                 message.To.Add(email);
-                message.Subject = "Подтвердите адрес электронной почты";
+                message.Subject = $"Подтвердите адрес электронной почты - {code}";
 
                 message.Body = Constants.HtmlMailTemplate!.Replace("{email}", email).Replace("{code}", code);
 

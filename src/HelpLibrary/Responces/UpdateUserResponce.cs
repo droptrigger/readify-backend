@@ -2,5 +2,5 @@
 
 namespace HelpLibrary.Responces
 {
-    public record UpdateUserResponce(UpdateUserDTO UpdateUser = null!);
+    public record UpdateUserResponce(UserDTO UpdateUser = null!);
 }

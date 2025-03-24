@@ -81,7 +81,7 @@ namespace ServerLibrary.Repositories.Implementations.UserI
                 .Include(u => u.BookReviews)
                     .ThenInclude(l => l.LikesReviews)
                 .AsSplitQuery()
-                .FirstOrDefaultAsync(u => u.Nickname == nic);
+                .FirstOrDefaultAsync(u => u.Nickname == nickname);
 
         public async Task RemoveFromDatabaseAsync(User user)
         {

@@ -71,7 +71,7 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task<UpdateUserResponce> UpdateUserAsync(UpdateUserDTO user)
+        public async Task<UserDTO> UpdateUserAsync(UpdateUserDTO user)
         {
             var updateUser = await _userRepository.FindByIdAsync(user.UserId);
             if (updateUser is null) throw new NotFoundUserException("Not found user");
@@ -89,7 +89,7 @@ namespace ServerLibrary.Services.Implementations
             await _userRepository.UpdateAsync(user);
             await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = user.UserId, Action = Constants.Update });
 
-            return new UpdateUserResponce(user);
+            return await ConvertToUserDTO.Convert(updateUser);
         }
 
         public async Task<GeneralResponce> RemoveUserAsync(int id)
