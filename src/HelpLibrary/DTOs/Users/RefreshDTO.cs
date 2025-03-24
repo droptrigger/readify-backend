@@ -4,9 +4,8 @@ namespace HelpLibrary.DTOs.Users
 {
     public class RefreshDTO
     {
-        public string? refreshToken { get; set; } = null!;
+        public string? Token { get; set; }
 
-        [Required]
-        public string? Device { get; set; }
+        public string? DeviceType { get; set; }
     }
 }

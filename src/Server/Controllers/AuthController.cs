@@ -1,8 +1,6 @@
 ﻿using HelpLibrary.DTOs.Users;
-using HelpLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ServerLibrary.Helpers.Exceptions.User;
 using ServerLibrary.Services.Interfaces;
 
 namespace Server.Controllers
@@ -19,7 +17,7 @@ namespace Server.Controllers
         }
 
         [HttpPost("/api/auth/register")]
-        public async Task<IActionResult> Register(RegistrationDTO user)
+        public async Task<IActionResult> Register([FromForm] RegistrationDTO user)
         {
             if (user == null) return BadRequest("Model is empty");
 
@@ -35,7 +33,7 @@ namespace Server.Controllers
         }
 
         [HttpPost("/api/auth/send-mail")]
-        public async Task<IActionResult> SendMail([FromBody] string email)
+        public async Task<IActionResult> SendMail([FromForm] string email)
         {
             if (email == null) return BadRequest("Model is empty");
             try
@@ -77,18 +75,21 @@ namespace Server.Controllers
         }
 
         [HttpPost("/api/auth/refresh")]
-        public async Task<IActionResult> Refresh([FromForm] RefreshDTO refreshToken = null!)
+        public async Task<IActionResult> Refresh([FromForm] RefreshDTO refreshToken)
         {
-            refreshToken.refreshToken = Request.Cookies["refreshToken"];
-
-            if (string.IsNullOrEmpty(refreshToken?.refreshToken))
+            if (refreshToken.DeviceType == "web")
+            {
+                refreshToken.Token = Request.Cookies["refreshToken"];
+            }
+            
+            if (string.IsNullOrEmpty(refreshToken?.Token))
             {
                 return BadRequest("Refresh token is missing.");
             }
 
             try
             {
-                var result = await _authService.RefreshToken(refreshToken.refreshToken!);
+                var result = await _authService.RefreshToken(refreshToken.Token!);
 
                 return Ok(result);
             }
@@ -98,21 +99,21 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("/api/auth/user")]
-        public async Task<IActionResult> GetUser(string emailOrUsername)
-        {
-            if (emailOrUsername is null) return BadRequest("Model is empty");
-            try
-            {
-                var result = await _authService.GetUserByEmailOrUsernameAsync(emailOrUsername);
-                return Ok(result);
-            }
-            catch (Exception ex) 
-            {
-                return BadRequest(ex.Message);
-            }
+        //[HttpGet("/api/auth/user")]
+        //public async Task<IActionResult> GetUser(string emailOrUsername)
+        //{
+        //    if (emailOrUsername is null) return BadRequest("Model is empty");
+        //    try
+        //    {
+        //        var result = await _authService.GetUserByEmailOrUsernameAsync(emailOrUsername);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex) 
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
 
-        }
+        //}
 
         [HttpPost("/api/auth/logout")]
         [Authorize]

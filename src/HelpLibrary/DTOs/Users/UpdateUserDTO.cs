@@ -13,9 +13,11 @@ namespace HelpLibrary.DTOs.Users
         [MaxLength(50, ErrorMessage = "Максимальное количество символов: 50")]
         public string? Nickname { get; set; } = null!;
 
-        [MaxLength(150)]
+        [MaxLength(250)]
         public string? Description { get; set; } = null!;
 
+
+        [MaxFileSize(5 * 1024 * 1024, ErrorMessage = "Максимальный размер файла: 5 МБ")]
         public IFormFile? AvatarImage { get; set; } = null!;
 
         [MinLength(2, ErrorMessage = "Минимальное количество символов: 2")]
