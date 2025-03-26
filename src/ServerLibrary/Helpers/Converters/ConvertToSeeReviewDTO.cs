@@ -14,7 +14,7 @@ namespace ServerLibrary.Helpers.Converters
             return new SeeReviewDTO
             {
                 Id = review.Id,
-                IdBook = review.IdBook,
+                Book = await ConvertToSeeBookDTO.Convert(review.IdBookNavigation),
                 Comment = review.Comment,
                 Rating = review.Rating,
                 CreatedAt = review.CreatedAt,

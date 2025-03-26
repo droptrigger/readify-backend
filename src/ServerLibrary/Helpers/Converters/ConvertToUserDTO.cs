@@ -32,7 +32,8 @@ namespace ServerLibrary.Helpers.Converters
                 IsBanned = user.IsBanned,
                 CreatedAt = user.CreatedAt,
                 AvatarImage = await GetBytes.GetArray(Constants.PathToUserAvatarForBytes + user.AvatarImagePath),
-                Books = (await Task.WhenAll(user.Libraries.Select(ConvertToLibraryDTO.Convert))).ToList(),
+                Books = (await Task.WhenAll(user.Libraries.Select(ConvertToLibraryDTO.Convert)))
+                    .OrderByDescending(lib => lib.Book?.Author?.Id == user.Id).ToList(),
                 Reviews = (await Task.WhenAll(user.BookReviews.Select(ConvertToSeeReviewDTO.Convert).ToList())).ToList(),
                 Subscribers = (await Task.WhenAll(
                     user.UserSubscriberIdAuthorNavigations.Select(async s =>

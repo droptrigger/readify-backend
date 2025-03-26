@@ -1,4 +1,5 @@
-﻿using HelpLibrary.DTOs.Users;
+﻿using HelpLibrary.DTOs.Books;
+using HelpLibrary.DTOs.Users;
 
 namespace HelpLibrary.DTOs.Reviews
 {
@@ -17,7 +18,7 @@ namespace HelpLibrary.DTOs.Reviews
         /// <summary>
         /// Id книги, на которую сделан отзыв
         /// </summary>
-        public int? IdBook { get; set; }
+        public SeeBookDTO? Book { get; set; }
 
         /// <summary>
         /// Текст отзыва
