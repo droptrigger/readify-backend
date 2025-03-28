@@ -22,6 +22,7 @@ namespace ServerLibrary.Helpers.Converters
                 Nickname = user.Nickname,
                 Name = user.Name,
                 AvatarImage = await GetBytes.GetArray(Constants.PathToUserAvatarForBytes + user.AvatarImagePath),
+                Description = user.Description
             };
 
             return authorDTO;

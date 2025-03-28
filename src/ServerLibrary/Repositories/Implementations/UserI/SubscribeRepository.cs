@@ -70,7 +70,7 @@ namespace ServerLibrary.Repositories.Implementations.UserI
 
         public async Task UnsubscribeAsync(SubscribeDTO unsubscribe)
         {
-            var model = GetSubByIdAsync(unsubscribe);
+            var model = await GetSubByIdAsync(unsubscribe);
             _context.Remove(model);
             await _context.SaveChangesAsync();
         }

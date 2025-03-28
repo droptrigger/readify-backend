@@ -1,7 +1,9 @@
 ﻿using HelpLibrary.DTOs.Subscribe;
 using HelpLibrary.DTOs.Users;
+using HelpLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using ServerLibrary.Services.Interfaces;
 
 namespace Server.Controllers
@@ -21,14 +23,16 @@ namespace Server.Controllers
         [HttpPut("/api/user/update")]
         public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDTO user)
         {
+            if (user == null) return BadRequest("Model is empty");
+
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id");
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
-                return BadRequest("Не удалось определить ID пользователя.");
+                return Unauthorized("Не удалось определить ID пользователя.");
             }
 
-            user.UserId = userId;
-            if (user == null) return BadRequest("Model is empty");
+            if (user.UserId != userId)
+                return Forbid("Ошибка");
 
             try
             {
@@ -52,7 +56,20 @@ namespace Server.Controllers
         [HttpPost("/api/user/subscribe")]
         public async Task<IActionResult> Subscribe([FromForm] SubscribeDTO sub)
         {
-            if (sub == null) return BadRequest("Model is empty");
+            if (sub == null)
+                return BadRequest("Model is empty");
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id");
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized("Не удалось определить ID пользователя.");
+            }
+
+            if (sub.SubscriberId != userId)
+                return Forbid("Ошибка");
+
+            if (sub.SubscriberId == sub.AuthorId)
+                return BadRequest("Ошибка! Нельзя подписываться на себя.");
 
             try
             {
@@ -68,7 +85,17 @@ namespace Server.Controllers
         [HttpPost("/api/user/unsubscribe")]
         public async Task<IActionResult> UnSubscribe([FromForm] SubscribeDTO unsub)
         {
-            if (unsub == null) return BadRequest("Model is empty");
+            if (unsub == null) 
+                return BadRequest("Model is empty");
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id");
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized("Не удалось определить ID пользователя.");
+            }
+
+            if (unsub.SubscriberId != userId)
+                return Forbid("Ошибка");
 
             try
             {

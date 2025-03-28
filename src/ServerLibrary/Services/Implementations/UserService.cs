@@ -43,7 +43,7 @@ namespace ServerLibrary.Services.Implementations
             return await ConvertToUserDTO.Convert(user);
         }
 
-        public async Task<GeneralResponce> SubscribeAsync(SubscribeDTO subscribe)
+        public async Task<UserDTO> SubscribeAsync(SubscribeDTO subscribe)
         {
             if (subscribe is null) throw new NullReferenceException("Model is empty");
 
@@ -55,20 +55,23 @@ namespace ServerLibrary.Services.Implementations
             await _subscribeRepository.SubscribeAsync(subscribe);
             await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = subscribe.SubscriberId, Action = Constants.Subscribe + subscribe.AuthorId });
 
-            return new GeneralResponce("Success");
+            return await GetUserDTO(subscribe.AuthorId);
         }
 
-        public async Task<GeneralResponce> UnsubscribeAsync(SubscribeDTO unsubscribe)
+        public async Task<UserDTO> UnsubscribeAsync(SubscribeDTO unsubscribe)
         {
             if (unsubscribe is null) throw new NullReferenceException("Model is empty");
 
-            var sub = await _subscribeRepository.GetSubByIdAsync(unsubscribe);
+            var sub = await _subscribeRepository.GetSubByIdAsync(unsubscribe); 
             if (sub is null) throw new NotFoundException("Don't found");
 
+            Console.WriteLine(sub.Id);
+
             await _subscribeRepository.UnsubscribeAsync(unsubscribe);
+
             await _logRepository.WriteLogsAsync(new LogsDTO { IdUser = unsubscribe.SubscriberId, Action = Constants.UnSubscribe + unsubscribe.AuthorId });
 
-            return new GeneralResponce("Success");
+            return await GetUserDTO(unsubscribe.AuthorId);
         }
 
         public async Task<UserDTO> UpdateUserAsync(UpdateUserDTO user)

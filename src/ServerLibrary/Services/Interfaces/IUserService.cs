@@ -28,14 +28,14 @@ namespace ServerLibrary.Services.Interfaces
         /// </summary>
         /// <param name="subscribe">Объект передачи данных, содержащий идентификаторы автора и подписчика</param>
         /// <returns>Объект класса GeneralResponce, содержащий ответ сервера</returns>
-        Task<GeneralResponce> SubscribeAsync(SubscribeDTO subscribe);
+        Task<UserDTO> SubscribeAsync(SubscribeDTO subscribe);
 
         /// <summary>
         /// Метод отписки от пользователя
         /// </summary>
         /// <param name="unsubscribe">Объект передачи данных, содержащий идентификаторы автора и подписчика</param>
         /// <returns>Объект класса GeneralResponce, содержащий ответ сервера</returns>
-        Task<GeneralResponce> UnsubscribeAsync(SubscribeDTO unsubscribe);
+        Task<UserDTO> UnsubscribeAsync(SubscribeDTO unsubscribe);
 
         /// <summary>
         /// Метод получения всех подписчиков
