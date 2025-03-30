@@ -1,5 +1,6 @@
 ﻿using HelpLibrary.DTOs.Library;
 using HelpLibrary.DTOs.Users;
+using HelpLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerLibrary.Repositories.Interfaces.ILibrares;
@@ -37,7 +38,6 @@ namespace Server.Controllers
         }
         
         [HttpDelete("/library")]
-        [Consumes("multipart/form-data")]
         public async Task<IActionResult> DeleteLibrary([FromForm] AddLibraryDTO library)
         {
             if (library == null) return BadRequest("Model is empty");
@@ -53,7 +53,7 @@ namespace Server.Controllers
             }
         }
         
-        [HttpPut("/library")]
+        [HttpPut("/api/library/{id}")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateLibrary([FromForm] UpdateProgressDTO library)
         {
@@ -70,8 +70,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("/library")]
-        [Consumes("multipart/form-data")]
+        [HttpGet("/api/library/{id}")]
         public async Task<IActionResult> GetLibrary(int id)
         {
             if (id < 0) return BadRequest("Model is empty");
@@ -79,6 +78,7 @@ namespace Server.Controllers
             try
             {
                 var result = await _libraryService.GetAllBooksUserAsync(id);
+                Console.WriteLine(result.NotFullyReadBooks.Count);
                 return Ok(result);
             }
             catch (Exception ex)

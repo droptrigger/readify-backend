@@ -24,7 +24,7 @@ namespace ServerLibrary.Helpers.Converters
                 Id = book.Id,
                 Name = book.Name,
                 Author = await ConvertToAuthorDTO.Convert(book.IdAuthorNavigation),
-                CoverImage = await GetBytes.GetArray(Constants.PathToBookImagesForBytes + book.CoverImagePath),
+                CoverImage = await GetBytes.GetArrayAsync(Constants.PathToBookImagesForBytes + book.CoverImagePath),
                 Genre = new GenreDTO 
                 { 
                     Id = book.IdGenreNavigation.Id, 

@@ -17,6 +17,8 @@ public partial class Library
 
     public virtual ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
 
+    public virtual ICollection<UpdatesLibraries> UpdatesLibrary { get; set; } = new List<UpdatesLibraries>();
+
     public virtual Book IdBookNavigation { get; set; } = null!;
 
     public virtual User IdUserNavigation { get; set; } = null!;

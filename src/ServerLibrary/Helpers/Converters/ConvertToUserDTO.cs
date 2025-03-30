@@ -19,8 +19,6 @@ namespace ServerLibrary.Helpers.Converters
             if (user == null)
                 return null!;
 
-            List<Book> books = user.Books.ToList();
-
             var userDTO = new UserDTO
             {
                 Id = user.Id,
@@ -31,7 +29,7 @@ namespace ServerLibrary.Helpers.Converters
                 IdRole = user.IdRole,
                 IsBanned = user.IsBanned,
                 CreatedAt = user.CreatedAt,
-                AvatarImage = await GetBytes.GetArray(Constants.PathToUserAvatarForBytes + user.AvatarImagePath),
+                AvatarImage = await GetBytes.GetArrayAsync(Constants.PathToUserAvatarForBytes + user.AvatarImagePath),
                 Books = (await Task.WhenAll(user.Libraries.Select(ConvertToLibraryDTO.Convert)))
                     .OrderByDescending(lib => lib.Book?.Author?.Id == user.Id).ToList(),
                 Reviews = (await Task.WhenAll(user.BookReviews.Select(ConvertToSeeReviewDTO.Convert).ToList())).ToList(),

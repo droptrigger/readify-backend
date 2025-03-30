@@ -127,9 +127,8 @@ namespace ServerLibrary.Repositories.Implementations.UserI
             var findUser = await FindByIdAsync(updateUser.UserId);
 
             if (updateUser.Nickname is not null) findUser!.Nickname = updateUser.Nickname!;
-            if (updateUser.Description is not null) findUser!.Description = updateUser.Description;
+            findUser!.Description = updateUser.Description;
             if (updateUser.Name is not null) findUser!.Name = updateUser.Name!;
-            if (updateUser.Password is not null) findUser!.PasswordHash = new PasswordHasher<object>().HashPassword(null!, updateUser.Password!);
 
             await _context.SaveChangesAsync();
             return findUser!;

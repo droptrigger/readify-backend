@@ -24,11 +24,17 @@ namespace ServerLibrary.Repositories.Implementations.Librares
         public async Task<Library> FindLibraryByIdUserIdBookAsync(AddLibraryDTO library) =>
             await _context.Libraries.FirstOrDefaultAsync(l => l.IdUser == library.idUser && l.IdBook == library.idBook);
 
-        public async Task<List<Book>> GetAllBooksFromLibraryAsync(int idUser) =>
+        public async Task<List<Library>> GetAllBooksFromLibraryAsync(int idUser) =>
             await _context.Libraries
-                .Where(library => library.IdUser == idUser)
                 .Include(library => library.IdBookNavigation)
-                .Select(library => library.IdBookNavigation)
+                .Include(u => u.IdBookNavigation)
+                .Include(u => u.IdBookNavigation)
+                    .ThenInclude(l => l.IdGenreNavigation)
+                .Include(l => l.IdBookNavigation)
+                    .ThenInclude(u => u.IdAuthorNavigation)
+                .Include(l => l.Bookmarks)
+                .AsSplitQuery()
+                .Where(library => library.IdUser == idUser)
                 .ToListAsync();
 
         public async Task RemoveBookFromLibraryAsync(Library library)

@@ -22,6 +22,8 @@ public partial class ReadifyContext : DbContext
 
     public virtual DbSet<Bookmark> Bookmarks { get; set; }
 
+    public virtual DbSet<UpdatesLibraries> UpdatesLibraries { get; set; }
+
     public virtual DbSet<Genre> Genres { get; set; }
 
     public virtual DbSet<СonfirmationСode> СonfirmationСodes { get; set; }
@@ -137,6 +139,23 @@ public partial class ReadifyContext : DbContext
                 .HasForeignKey(d => d.IdLibrary)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Bookmarks_Libraries");
+        });
+
+        modelBuilder.Entity<UpdatesLibraries>(entity =>
+        {
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Action)
+                .HasMaxLength(100)
+                .HasColumnName("action");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IdLibrary).HasColumnName("id_library");
+
+            entity.HasOne(d => d.IdLibraryNavigation).WithMany(p => p.UpdatesLibrary)
+                .HasForeignKey(d => d.IdLibrary)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UpdatesLibraries_Libraries");
         });
 
         modelBuilder.Entity<Genre>(entity =>

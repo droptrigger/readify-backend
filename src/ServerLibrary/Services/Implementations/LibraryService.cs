@@ -3,6 +3,7 @@ using HelpLibrary.DTOs.Library;
 using HelpLibrary.Entities;
 using HelpLibrary.Responces;
 using ServerLibrary.Helpers;
+using ServerLibrary.Helpers.Converters.Libraries;
 using ServerLibrary.Repositories.Interfaces;
 using ServerLibrary.Repositories.Interfaces.ILibrares;
 using ServerLibrary.Services.Interfaces;
@@ -94,8 +95,14 @@ namespace ServerLibrary.Services.Implementations
         public async Task<List<Bookmark>> GetAllBookmarksLibraryAsync(int idLibrary) =>
             await _bookmarksRepository.GetAllBookmarksByLibrayAsync(idLibrary);
 
-        public async Task<List<Book>> GetAllBooksUserAsync(int id) =>
-            await _libraryRepository.GetAllBooksFromLibraryAsync(id);
+
+        public async Task<SeeLibrariesDTO> GetAllBooksUserAsync(int id)
+        {
+            var libraries = await _libraryRepository.GetAllBooksFromLibraryAsync(id);
+            Console.WriteLine(libraries.Count);
+            return ConvertToSeeLibraryDTO.Convert(libraries);
+        }
+
 
         public async Task<GeneralResponce> UpdateBookmarkAsync(UpdateBookmarkDTO update)
         {

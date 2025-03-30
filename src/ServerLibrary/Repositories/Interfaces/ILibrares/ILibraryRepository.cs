@@ -31,7 +31,7 @@ namespace ServerLibrary.Repositories.Interfaces.ILibrares
         /// </summary>
         /// <param name="idUser">Идентификатор пользователя</param>
         /// <returns>Список книг</returns>
-        Task<List<Book>> GetAllBooksFromLibraryAsync(int idUser);
+        Task<List<Library>> GetAllBooksFromLibraryAsync(int idUser);
 
         /// <summary>
         /// Метод поиска книги пользователя по идентификатору книги и идентификатору пользователя

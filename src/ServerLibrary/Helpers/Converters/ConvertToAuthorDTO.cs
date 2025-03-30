@@ -21,7 +21,7 @@ namespace ServerLibrary.Helpers.Converters
                 Id = user.Id,
                 Nickname = user.Nickname,
                 Name = user.Name,
-                AvatarImage = await GetBytes.GetArray(Constants.PathToUserAvatarForBytes + user.AvatarImagePath),
+                AvatarImage = await GetBytes.GetArrayAsync(Constants.PathToUserAvatarForBytes + user.AvatarImagePath),
                 Description = user.Description
             };
 

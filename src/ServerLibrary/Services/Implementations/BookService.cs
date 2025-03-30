@@ -8,6 +8,7 @@ using ServerLibrary.Helpers.Exceptions;
 using ServerLibrary.Repositories.Interfaces;
 using ServerLibrary.Repositories.Interfaces.Books;
 using ServerLibrary.Repositories.Interfaces.BooksInterfaces;
+using ServerLibrary.Repositories.Interfaces.ILibrares;
 using ServerLibrary.Services.Interfaces;
 using System.Net;
 
@@ -20,19 +21,22 @@ namespace ServerLibrary.Services.Implementations
         private readonly IBookRepository _bookRepository;
         private readonly IBookReviewRepository _bookReviewRepository;
         private readonly ILikesReviewsRepository _likesReviewRepository;
+        private readonly ILibraryRepository _libraryRepository;
         
         public BookService(
             IGenreRepository genreRepository, 
             ILogRepository logRepository, 
             IBookRepository bookRepository,
             IBookReviewRepository bookReviewRepository,
-            ILikesReviewsRepository likesReviewsRepository)
+            ILikesReviewsRepository likesReviewsRepository,
+            ILibraryRepository libraryRepository)
         {
             _genreRepository = genreRepository;
             _logRepository = logRepository;
             _bookRepository = bookRepository;
             _bookReviewRepository = bookReviewRepository;
-            _likesReviewRepository = likesReviewsRepository; 
+            _likesReviewRepository = likesReviewsRepository;
+            _libraryRepository = libraryRepository;
         }
 
         public async Task<GeneralResponce> AddBookAsync(AddBookDTO book)
@@ -63,6 +67,16 @@ namespace ServerLibrary.Services.Implementations
             {
                 throw new Exception(ex.Message);
             }
+
+            Library library = new Library
+            {
+                IdUser = book.IdAuthor,
+                IdBook = addedBook.Id,
+                CreatedAt = DateTime.UtcNow,
+                ProgressPage = 0
+            };
+
+            await _libraryRepository.AddBookToLibraryAsync(library);
 
             await _bookRepository.SaveChangesAsync();
             return new GeneralResponce("Success");
