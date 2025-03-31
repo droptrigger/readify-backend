@@ -26,7 +26,14 @@ namespace ServerLibrary.Repositories.Implementations.Books
             await _context.Books.Where(b => EF.Functions.Like(b.Name, $"%{name.ToLower()}%")).ToListAsync();
 
         public async Task<Book> FindBookByIdAsync(int id) =>
-            await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+            await _context.Books             
+                .Include(b => b.IdGenreNavigation)
+                .Include(b => b.Libraries)
+                    .ThenInclude(l => l.IdUserNavigation)
+                .Include(u => u.BookReviews)
+                    .ThenInclude(l => l.LikesReviews)
+                 .AsSplitQuery()
+                .FirstOrDefaultAsync(b => b.Id == id);
 
         public async Task<List<Book>> GetAllBooksByGenreAsync(int idGenre) =>
             await _context.Books.Where(b => b.IdGenre == idGenre).ToListAsync();

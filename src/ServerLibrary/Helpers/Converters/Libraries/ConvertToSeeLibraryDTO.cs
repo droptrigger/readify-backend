@@ -100,7 +100,7 @@ namespace ServerLibrary.Helpers.Converters.Libraries
                 Genre = new GenreDTO
                 {
                     Id = library.IdBookNavigation.IdGenreNavigation.Id,
-                    Name = library.IdBookNavigation.IdGenreNavigation.Name
+                    Name = library.IdBookNavigation.IdGenreNavigation.Name.ToLower()
                 },
                 ImageBytes = GetBytes.GetArray(Constants.PathToBookImagesForBytes + library.IdBookNavigation.CoverImagePath)
             };
