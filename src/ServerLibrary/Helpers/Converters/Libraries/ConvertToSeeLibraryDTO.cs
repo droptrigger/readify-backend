@@ -14,7 +14,11 @@ namespace ServerLibrary.Helpers.Converters.Libraries
             if (libraries == null)
                 return new SeeLibrariesDTO();
 
-            Library library = libraries.Last();
+            Library? library = libraries.LastOrDefault();
+
+            if (library is null)
+                return new SeeLibrariesDTO();
+
             int idAuthor = library.IdUser;
 
             return new SeeLibrariesDTO

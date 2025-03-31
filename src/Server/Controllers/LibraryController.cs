@@ -78,7 +78,6 @@ namespace Server.Controllers
             try
             {
                 var result = await _libraryService.GetAllBooksUserAsync(id);
-                Console.WriteLine(result.NotFullyReadBooks.Count);
                 return Ok(result);
             }
             catch (Exception ex)
