@@ -4,6 +4,7 @@ using HelpLibrary.Entities;
 using HelpLibrary.Responces;
 using Microsoft.AspNetCore.Http;
 using ServerLibrary.Helpers;
+using ServerLibrary.Helpers.Converters;
 using ServerLibrary.Helpers.Exceptions;
 using ServerLibrary.Repositories.Interfaces;
 using ServerLibrary.Repositories.Interfaces.Books;
@@ -142,12 +143,12 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task<Book> GetBookAsync(int id)
+        public async Task<BookDTO> GetBookAsync(int id)
         {
             var result = await _bookRepository.FindBookByIdAsync(id);
             if (result is null) throw new Exception("Don't found");
 
-            return result;
+            return await ConvertToBookDTO.Convert(result);
         }
 
         public async Task<BookReview> GetBookReviewAsync(int id)

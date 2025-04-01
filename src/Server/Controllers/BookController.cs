@@ -70,7 +70,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("/books")]
+        [HttpGet("/api/books/{id}")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> GetBook(int id)
         {

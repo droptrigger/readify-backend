@@ -29,7 +29,7 @@ namespace ServerLibrary.Services.Interfaces
         /// <returns>Ответ сервера</returns>
         Task<GeneralResponce> UpdateBookAsync(UpdateBookDTO book);
 
-        Task<Book> GetBookAsync(int id);
+        Task<BookDTO> GetBookAsync(int id);
 
 
         Task<GeneralResponce> AddBookReviewAsync(AddReviewDTO review);

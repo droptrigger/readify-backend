@@ -64,6 +64,6 @@ namespace HelpLibrary.DTOs.Books
         /// <summary>
         /// Список отзывов на книгу
         /// </summary>
-        public List<SeeReviewDTO>? Reviews { get; set; }
+        public List<SeeReviewBookDTO>? Reviews { get; set; }
     }
 }
