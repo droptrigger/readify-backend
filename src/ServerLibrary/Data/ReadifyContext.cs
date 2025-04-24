@@ -75,7 +75,7 @@ public partial class ReadifyContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.Description)
-                .HasMaxLength(250)
+                .HasMaxLength(1000)
                 .HasColumnName("description");
             entity.Property(e => e.PageQuantity).HasColumnName("page_quantity");
             entity.Property(e => e.FileBookPath)

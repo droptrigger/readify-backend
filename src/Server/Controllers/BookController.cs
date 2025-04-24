@@ -71,7 +71,6 @@ namespace Server.Controllers
         }
 
         [HttpGet("/api/books/{id}")]
-        [Consumes("multipart/form-data")]
         public async Task<IActionResult> GetBook(int id)
         {
             if (id < 0) return BadRequest("Model is empty");

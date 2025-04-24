@@ -134,6 +134,34 @@ namespace ServerLibrary.Repositories.Implementations.UserI
             return findUser!;
         }
 
+        public async Task<List<User>>? FindAllByNicknameAsync(string name) =>
+            await _context.Users
+                .Include(u => u.Books)
+                    .ThenInclude(b => b.IdGenreNavigation)
+                .Include(u => u.Libraries)
+                    .ThenInclude(l => l.IdBookNavigation)
+                        .ThenInclude(b => b.IdGenreNavigation)
+                .Include(u => u.Libraries)
+                    .ThenInclude(l => l.IdBookNavigation)
+                        .ThenInclude(u => u.IdAuthorNavigation)
+                .Include(u => u.Libraries)
+                    .ThenInclude(l => l.Bookmarks)
+                .Include(u => u.UserSubscriberIdAuthorNavigations)
+                    .ThenInclude(us => us.IdSubscriberNavigation)
+                .Include(u => u.UserSubscriberIdSubscriberNavigations)
+                    .ThenInclude(us => us.IdAuthorNavigation)
+                .Include(u => u.BookReviews)
+                    .ThenInclude(r => r.IdBookNavigation)
+                        .ThenInclude(b => b.IdAuthorNavigation)
+                .Include(u => u.BookReviews)
+                    .ThenInclude(l => l.LikesReviews)
+                .Include(u => u.BookReviews)
+                    .ThenInclude(l => l.IdBookNavigation)
+                        .ThenInclude(b => b.IdGenreNavigation)
+                .AsSplitQuery()
+                .Where(u => EF.Functions.Like(u.Name, $"%{name.ToLower()}%")).ToListAsync();
+
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

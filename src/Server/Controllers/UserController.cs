@@ -51,7 +51,16 @@ namespace Server.Controllers
             var userDTO = await _userService.GetUserDTO(id);
 
             return Ok(userDTO);
-        } 
+        }
+
+        [HttpGet("/api/user/search")] 
+        public async Task<IActionResult> Search(string searchText)
+        {
+            var searchDTO = await _userService.SearchAsync(searchText);
+
+            return Ok(searchDTO);
+        }
+        
 
         [HttpPost("/api/user/subscribe")]
         public async Task<IActionResult> Subscribe([FromForm] SubscribeDTO sub)

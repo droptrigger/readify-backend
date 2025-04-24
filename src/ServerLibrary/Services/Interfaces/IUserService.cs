@@ -1,4 +1,5 @@
-﻿using HelpLibrary.DTOs.Subscribe;
+﻿using HelpLibrary.DTOs;
+using HelpLibrary.DTOs.Subscribe;
 using HelpLibrary.DTOs.Users;
 using HelpLibrary.Entities;
 using HelpLibrary.Responces;
@@ -50,5 +51,12 @@ namespace ServerLibrary.Services.Interfaces
         /// <param name="idUser">Идентификатор пользователя</param>
         /// <returns>Список пользователей</returns>
         Task<List<UserInfoDTO>> GetAllSubscriptionsAsync(int idUser);
+
+        /// <summary>
+        /// Метод поиска книг и пользователей
+        /// </summary>
+        /// <param name="searchText">Поисковой текст</param>
+        /// <returns>Список найденных пользователей и книг</returns>
+        Task<SearchDTO> SearchAsync(string searchText);
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using HelpLibrary.DTOs.Subscribe;
 using ServerLibrary.Repositories.Interfaces.IUser;
 using ServerLibrary.Helpers.Converters;
+using ServerLibrary.Repositories.Interfaces.Books;
 
 namespace ServerLibrary.Services.Implementations
 {
@@ -20,12 +21,15 @@ namespace ServerLibrary.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly ILogRepository _logRepository;
         private readonly ISubscribeRepository _subscribeRepository;
+        private readonly IBookRepository _bookRepository;
 
-        public UserService(IUserRepository userRepository, ILogRepository logRepository, ISubscribeRepository subscribeRepository)
+        public UserService(IUserRepository userRepository, ILogRepository logRepository, ISubscribeRepository subscribeRepository, IBookRepository bookRepository)
         {
             _userRepository = userRepository;
             _logRepository = logRepository;
             _subscribeRepository = subscribeRepository;
+            _bookRepository = bookRepository;
+            
         }
 
         public async Task<List<UserInfoDTO>> GetAllSubscribersAsync(int idAuthor) =>
@@ -123,6 +127,21 @@ namespace ServerLibrary.Services.Implementations
             {
                 throw new Exception($"Error while downloading file: {ex.Message}", ex);
             }
+        }
+
+        public async Task<SearchDTO> SearchAsync(string searchText)
+        {
+            if (searchText is null) throw new Exception("Model is empty");
+
+            var foundUsers = await _userRepository.FindAllByNicknameAsync(searchText)!;
+            var foundBooks = await _bookRepository.FindAllBooksByNameAsync(searchText);
+
+            return new SearchDTO
+            {
+                SearchText = searchText,
+                FoundBooks = (await Task.WhenAll(foundBooks.Select(ConvertToSeeBookDTO.Convert))).ToList(),
+                FoundUsers = (await Task.WhenAll(foundUsers.Select(ConvertToAuthorDTO.Convert))).ToList()
+            };
         }
     }
 }

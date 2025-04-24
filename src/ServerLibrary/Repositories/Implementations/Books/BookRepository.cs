@@ -23,7 +23,10 @@ namespace ServerLibrary.Repositories.Implementations.Books
             await _context.Books.Where(b => EF.Functions.Like(b.Description, $"%{description.ToLower()}%")).ToListAsync();
 
         public async Task<List<Book>> FindAllBooksByNameAsync(string name) =>
-            await _context.Books.Where(b => EF.Functions.Like(b.Name, $"%{name.ToLower()}%")).ToListAsync();
+            await _context.Books
+            .Include(b => b.IdGenreNavigation)
+            .Include(b => b.IdAuthorNavigation)
+            .Where(b => EF.Functions.Like(b.Name, $"%{name.ToLower()}%")).ToListAsync();
 
         public async Task<Book> FindBookByIdAsync(int id) =>
             await _context.Books             
