@@ -50,5 +50,11 @@ namespace ServerLibrary.Repositories.Interfaces.Books
         /// <param name="name">Название</param>
         /// <returns>Найденные жанры</returns>
         Task<List<Genre>> FindAllGenresByNameAsync(string name);
+
+        /// <summary>
+        /// Метод получния всех жанров
+        /// </summary>
+        /// <returns>Список жанров</returns>
+        Task<List<Genre>> GetAllGenresAsync();
     }
 }

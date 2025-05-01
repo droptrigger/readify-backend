@@ -43,6 +43,7 @@ namespace ServerLibrary.Services.Interfaces
         Task<GeneralResponce> RemoveLikeAsync(int idLike);
 
 
+        Task<List<Genre>> GetAllGenresAsync();
         Task<GeneralResponce> AddGenreAsync(string name);
         Task<GeneralResponce> RemoveGenreAsync(int id);
         Task<GeneralResponce> UpdateGenreAsync(GenreDTO genre);

@@ -49,5 +49,8 @@ namespace ServerLibrary.Repositories.Implementations.Books
             await _context.SaveChangesAsync();
             return findGenre;
         }
+
+        public async Task<List<Genre>> GetAllGenresAsync() =>
+            await _context.Genres.ToListAsync();
     }
 }

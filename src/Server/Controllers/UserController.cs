@@ -54,7 +54,7 @@ namespace Server.Controllers
         }
 
         [HttpGet("/api/user/search")] 
-        public async Task<IActionResult> Search(string searchText)
+        public async Task<IActionResult> Search([FromForm] string searchText)
         {
             var searchDTO = await _userService.SearchAsync(searchText);
 

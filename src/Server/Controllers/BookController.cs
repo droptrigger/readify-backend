@@ -19,8 +19,15 @@ namespace Server.Controllers
             _bookService = bookService;
         }
 
-        [HttpPost("/books")]
-        [Consumes("multipart/form-data")]
+
+        [HttpGet("/api/books/genres")]
+        public async Task<IActionResult> GetGenres()
+        {
+            var result = await _bookService.GetAllGenresAsync();
+            return Ok(result);
+        }
+
+        [HttpPost("/api/books")]
         public async Task<IActionResult> AddBook([FromForm] AddBookDTO book)
         {
             if (book == null) return BadRequest("Model is empty");

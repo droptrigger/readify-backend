@@ -9,7 +9,7 @@ namespace HelpLibrary.DTOs.Books
         [Required]
         public string Name { get; set; } = null!;
 
-        [MaxLength(250, ErrorMessage = "Максимальное количество символов: 250")]
+        [MaxLength(1000, ErrorMessage = "Максимальное количество символов: 1000")]
         public string? Description { get; set; } = null!;
 
         [Required]
@@ -19,7 +19,7 @@ namespace HelpLibrary.DTOs.Books
         public int IdAuthor { get; set; }
 
         [Required]
-        public IFormFile CoverImageFIle { get; set; } = null!;
+        public IFormFile CoverImageFile { get; set; } = null!;
 
         [Required]
         public IFormFile FileBook { get; set; } = null!;

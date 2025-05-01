@@ -18,7 +18,6 @@ using System.Net.Mail;
 using System.Net;
 using HelpLibrary.DTOs.Mail;
 using ServerLibrary.Repositories.Interfaces.IUser;
-using HelpLibrary.DTOs.Library;
 using ServerLibrary.Helpers.Converters;
 
 namespace ServerLibrary.Services.Implementations

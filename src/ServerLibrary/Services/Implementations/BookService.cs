@@ -62,7 +62,7 @@ namespace ServerLibrary.Services.Implementations
             try
             {
                 await DownloadFile(book.FileBook, addedBook);
-                await DownloadImage(book.CoverImageFIle, addedBook);
+                await DownloadImage(book.CoverImageFile, addedBook);
             }
             catch (Exception ex)
             {
@@ -223,6 +223,11 @@ namespace ServerLibrary.Services.Implementations
             await _genreRepository.UpdateGenreAsync(genre);
 
             return new GeneralResponce($"A genre id {genre.Id} has been updated, new name {genre.Name}");
+        }
+
+        public async Task<List<Genre>> GetAllGenresAsync()
+        {
+            return await _genreRepository.GetAllGenresAsync();
         }
 
         public async Task<GeneralResponce> UpdateLikeAsync(UpdateLikeReviewDTO updateLike)
