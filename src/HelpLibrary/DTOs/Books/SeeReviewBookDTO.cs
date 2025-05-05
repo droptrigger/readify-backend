@@ -1,10 +1,4 @@
-﻿using HelpLibrary.DTOs.Reviews;
-using HelpLibrary.DTOs.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HelpLibrary.DTOs.Users;
 
 namespace HelpLibrary.DTOs.Books
 {
@@ -39,10 +33,5 @@ namespace HelpLibrary.DTOs.Books
         /// Дата написания отзыва
         /// </summary>
         public DateTime? CreatedAt { get; set; }
-
-        /// <summary>
-        /// Список лайков отзыва
-        /// </summary>
-        public List<LikeDTO>? Likes { get; set; }
     }
 }

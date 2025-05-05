@@ -21,7 +21,6 @@ namespace ServerLibrary.Services.Implementations
         private readonly ILogRepository _logRepository;
         private readonly IBookRepository _bookRepository;
         private readonly IBookReviewRepository _bookReviewRepository;
-        private readonly ILikesReviewsRepository _likesReviewRepository;
         private readonly ILibraryRepository _libraryRepository;
         
         public BookService(
@@ -29,14 +28,12 @@ namespace ServerLibrary.Services.Implementations
             ILogRepository logRepository, 
             IBookRepository bookRepository,
             IBookReviewRepository bookReviewRepository,
-            ILikesReviewsRepository likesReviewsRepository,
             ILibraryRepository libraryRepository)
         {
             _genreRepository = genreRepository;
             _logRepository = logRepository;
             _bookRepository = bookRepository;
             _bookReviewRepository = bookReviewRepository;
-            _likesReviewRepository = likesReviewsRepository;
             _libraryRepository = libraryRepository;
         }
 
@@ -113,27 +110,6 @@ namespace ServerLibrary.Services.Implementations
          
         }
 
-        public async Task<GeneralResponce> AddLikeAsync(AddLikeReviewDTO like)
-        {
-            if (like is null) throw new NullReferenceException("Model is empty");
-
-            var find = await _likesReviewRepository.GetLikeByAuthorIdAndReviewIdAsync(like.IdAuthor, like.IdReview);
-            if (find is not null) throw new Exception("Have you given a reaction");
-
-            LikesReview newLike = new LikesReview()
-            {
-                IdAuthor = like.IdAuthor,
-                IdReview = like.IdReview,
-                ReactionType = like.ReactionType,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var result = await _likesReviewRepository.AddToDatabaseAsync(newLike);
-            if (result is null) throw new Exception("Error");
-
-            return new GeneralResponce("Succes");
-        }
-
         public async Task<GeneralResponce> DeleteBookReviewAsync(int id)
         {
             var findReview = await _bookReviewRepository.FindByIdAsync(id);
@@ -159,14 +135,6 @@ namespace ServerLibrary.Services.Implementations
             return result;
         }
 
-        public async Task<LikesReview> GetLikeAsync(int id)
-        {
-            var result = await _likesReviewRepository.GetLikesReviewByIdAsync(id);
-            if (result is null) throw new Exception("Don't found");
-
-            return result;
-        }
-
         public async Task<GeneralResponce> RemoveBookAsync(int id)
         {
             var book = await _bookRepository.FindBookByIdAsync(id);
@@ -184,14 +152,6 @@ namespace ServerLibrary.Services.Implementations
             await _genreRepository.DeleteGenreAsync(id);
 
             return new GeneralResponce($"A genre id {id} has been deleted");
-        }
-
-        public async Task<GeneralResponce> RemoveLikeAsync(int idLike)
-        {
-            var find = await _likesReviewRepository.GetLikesReviewByIdAsync(idLike);
-            if (find is null) throw new NotFoundException("Don't found");
-            await _likesReviewRepository.DeleteLikeReviewAsync(find);
-            return new GeneralResponce("Success");
         }
 
         public async Task<GeneralResponce> UpdateBookAsync(UpdateBookDTO book)
@@ -228,16 +188,6 @@ namespace ServerLibrary.Services.Implementations
         public async Task<List<Genre>> GetAllGenresAsync()
         {
             return await _genreRepository.GetAllGenresAsync();
-        }
-
-        public async Task<GeneralResponce> UpdateLikeAsync(UpdateLikeReviewDTO updateLike)
-        {
-            if (updateLike is null) throw new NullReferenceException("Model is empty");
-
-            var result = await _likesReviewRepository.UpdateLikeReviewAsync(updateLike);
-            if (result is null) throw new Exception("Error");
-
-            return new GeneralResponce("Success");
         }
 
         private async Task<string> DownloadFile(IFormFile file, Book book)

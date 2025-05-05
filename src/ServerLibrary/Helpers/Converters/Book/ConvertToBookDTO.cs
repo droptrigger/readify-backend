@@ -37,15 +37,6 @@ namespace ServerLibrary.Helpers.Converters
             {
                 var reviewAuthorDto = await ConvertToAuthorDTO.Convert(review.IdAuthorNavigation);
 
-                var likes = review.LikesReviews.Select(l => new LikeDTO
-                {
-                    Id = l.Id,
-                    IdAuthor = l.IdAuthor,
-                    IdReview = l.IdReview,
-                    ReactionType = l.ReactionType,
-                    CreatedAt = l.CreatedAt
-                }).ToList();
-
                 reviews.Add(new SeeReviewBookDTO
                 {
                     Id = review.Id,
@@ -54,7 +45,6 @@ namespace ServerLibrary.Helpers.Converters
                     Comment = review.Comment,
                     Rating = review.Rating,
                     CreatedAt = review.CreatedAt,
-                    Likes = likes
                 });
             }
 

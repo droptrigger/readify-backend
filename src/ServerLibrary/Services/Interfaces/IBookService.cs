@@ -37,11 +37,6 @@ namespace ServerLibrary.Services.Interfaces
         Task<GeneralResponce> UpdateBookReviewAsync(UpdateReviewDTO update);
         Task<GeneralResponce> DeleteBookReviewAsync(int id);
 
-        Task<GeneralResponce> AddLikeAsync(AddLikeReviewDTO like);
-        Task<LikesReview> GetLikeAsync(int id);
-        Task<GeneralResponce> UpdateLikeAsync(UpdateLikeReviewDTO updateLike);
-        Task<GeneralResponce> RemoveLikeAsync(int idLike);
-
 
         Task<List<Genre>> GetAllGenresAsync();
         Task<GeneralResponce> AddGenreAsync(string name);

@@ -80,18 +80,14 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshRepository, RefreshRepository>();
 builder.Services.AddScoped<IMailRepository, MailRepository>();
 builder.Services.AddScoped<ISubscribeRepository, SubscribeRepository>();
-builder.Services.AddScoped<IBanRepository, BanRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
-builder.Services.AddScoped<IBookmarksRepository, BookmarkRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookReviewRepository, BookReviewRepository>();
-builder.Services.AddScoped<ILikesReviewsRepository, LikesReviewsRepository>();
 
 // Register services
 builder.Services.AddScoped<IAuthentificatonService, AuthentificatonService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ILibraryService, LibraryService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();

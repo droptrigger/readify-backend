@@ -14,35 +14,14 @@ namespace ServerLibrary.Services.Implementations
     {
         private readonly ILibraryRepository _libraryRepository;
         private readonly ILogRepository _logRepository;
-        private readonly IBookmarksRepository _bookmarksRepository;
 
 
         public LibraryService(
             ILibraryRepository libraryRepository, 
-            ILogRepository logRepository, 
-            IBookmarksRepository bookmarksRepository)
+            ILogRepository logRepository)
         {
             _libraryRepository = libraryRepository;
             _logRepository = logRepository;
-            _bookmarksRepository = bookmarksRepository;
-        }
-
-        public async Task<GeneralResponce> AddBokmarkAsync(AddBookmarkDTO addBookmark)
-        {
-            if (addBookmark is null) throw new NullReferenceException("Model is empty");
-
-            Bookmark bookmark = new Bookmark()
-            {
-                IdLibrary = addBookmark.IdLibrary,
-                Page = addBookmark.Page,
-                Comment = addBookmark.Comment,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var result = await _bookmarksRepository.AddBookMarkAsync(bookmark);
-            if (result is null) throw new Exception("Oopsss... Erorr :/");
-
-            return new GeneralResponce("Success");
         }
 
         public async Task<GeneralResponce> AddBookToLibraryAsync(AddLibraryDTO library)
@@ -81,20 +60,6 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task<GeneralResponce> DeleteBookmarkAsync(int idBookmark)
-        {
-            var bookmark = await _bookmarksRepository.GetBookmarkByIdAsync(idBookmark);
-            if (bookmark is null) throw new Exception("I did not find such an entry.");
-
-            await _bookmarksRepository.RemoveBookMarkAsync(bookmark);
-
-            return new GeneralResponce("Success");
-
-        }
-
-        public async Task<List<Bookmark>> GetAllBookmarksLibraryAsync(int idLibrary) =>
-            await _bookmarksRepository.GetAllBookmarksByLibrayAsync(idLibrary);
-
 
         public async Task<SeeLibrariesDTO> GetAllBooksUserAsync(int id)
         {
@@ -103,14 +68,6 @@ namespace ServerLibrary.Services.Implementations
             return ConvertToSeeLibraryDTO.Convert(libraries);
         }
 
-
-        public async Task<GeneralResponce> UpdateBookmarkAsync(UpdateBookmarkDTO update)
-        {
-            if (update is null) throw new Exception("Model is empty.");
-
-            await _bookmarksRepository.UpdateBookmarkAsync(update);
-            return new GeneralResponce("Success");
-        }
 
         public async Task<GeneralResponce> UpdateProgressPagesAsync(UpdateProgressDTO update)
         {

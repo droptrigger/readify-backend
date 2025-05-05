@@ -32,7 +32,6 @@ namespace ServerLibrary.Repositories.Implementations.Librares
                     .ThenInclude(l => l.IdGenreNavigation)
                 .Include(l => l.IdBookNavigation)
                     .ThenInclude(u => u.IdAuthorNavigation)
-                .Include(l => l.Bookmarks)
                 .AsSplitQuery()
                 .Where(library => library.IdUser == idUser)
                 .ToListAsync();

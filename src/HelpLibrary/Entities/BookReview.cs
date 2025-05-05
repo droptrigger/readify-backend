@@ -20,6 +20,4 @@ public partial class BookReview
     public virtual User IdAuthorNavigation { get; set; } = null!;
 
     public virtual Book IdBookNavigation { get; set; } = null!;
-
-    public virtual ICollection<LikesReview> LikesReviews { get; set; } = new List<LikesReview>();
 }

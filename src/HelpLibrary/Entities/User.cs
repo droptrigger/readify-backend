@@ -22,8 +22,6 @@ public partial class User
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual ICollection<BannedUser> BannedUsers { get; set; } = new List<BannedUser>();
-
     public virtual ICollection<BookReview> BookReviews { get; set; } = new List<BookReview>();
 
     public virtual ICollection<Book> Books { get; set; } = new List<Book>();
@@ -31,8 +29,6 @@ public partial class User
     public virtual Role IdRoleNavigation { get; set; } = null!;
 
     public virtual ICollection<Library> Libraries { get; set; } = new List<Library>();
-
-    public virtual ICollection<LikesReview> LikesReviews { get; set; } = new List<LikesReview>();
 
     public virtual ICollection<Log> Logs { get; set; } = new List<Log>();
 

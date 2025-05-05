@@ -14,23 +14,15 @@ public partial class ReadifyContext : DbContext
     {
     }
 
-    public virtual DbSet<BannedUser> BannedUsers { get; set; }
-
     public virtual DbSet<Book> Books { get; set; }
 
     public virtual DbSet<BookReview> BookReviews { get; set; }
-
-    public virtual DbSet<Bookmark> Bookmarks { get; set; }
-
-    public virtual DbSet<UpdatesLibraries> UpdatesLibraries { get; set; }
 
     public virtual DbSet<Genre> Genres { get; set; }
 
     public virtual DbSet<СonfirmationСode> СonfirmationСodes { get; set; }
 
     public virtual DbSet<Library> Libraries { get; set; }
-
-    public virtual DbSet<LikesReview> LikesReviews { get; set; }
 
     public virtual DbSet<Log> Logs { get; set; }
 
@@ -48,23 +40,6 @@ public partial class ReadifyContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BannedUser>(entity =>
-        {
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.BanReason)
-                .HasMaxLength(200)
-                .HasColumnName("ban_reason");
-            entity.Property(e => e.BannedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("banned_at");
-            entity.Property(e => e.IdUser).HasColumnName("id_user");
-
-            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.BannedUsers)
-                .HasForeignKey(d => d.IdUser)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_BannedUsers_Users");
-        });
-
         modelBuilder.Entity<Book>(entity =>
         {
             entity.Property(e => e.Id).HasColumnName("id");
@@ -123,41 +98,6 @@ public partial class ReadifyContext : DbContext
                 .HasConstraintName("FK_BookReviews_Books1");
         });
 
-        modelBuilder.Entity<Bookmark>(entity =>
-        {
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Comment)
-                .HasMaxLength(100)
-                .HasColumnName("comment");
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.IdLibrary).HasColumnName("id_library");
-            entity.Property(e => e.Page).HasColumnName("page");
-
-            entity.HasOne(d => d.IdLibraryNavigation).WithMany(p => p.Bookmarks)
-                .HasForeignKey(d => d.IdLibrary)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Bookmarks_Libraries");
-        });
-
-        modelBuilder.Entity<UpdatesLibraries>(entity =>
-        {
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Action)
-                .HasMaxLength(100)
-                .HasColumnName("action");
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.IdLibrary).HasColumnName("id_library");
-
-            entity.HasOne(d => d.IdLibraryNavigation).WithMany(p => p.UpdatesLibrary)
-                .HasForeignKey(d => d.IdLibrary)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_UpdatesLibraries_Libraries");
-        });
-
         modelBuilder.Entity<Genre>(entity =>
         {
             entity.Property(e => e.Id).HasColumnName("id");
@@ -199,27 +139,6 @@ public partial class ReadifyContext : DbContext
                 .HasForeignKey(d => d.IdUser)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Libraries_Users");
-        });
-
-        modelBuilder.Entity<LikesReview>(entity =>
-        {
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.IdAuthor).HasColumnName("id_author");
-            entity.Property(e => e.IdReview).HasColumnName("id_review");
-            entity.Property(e => e.ReactionType).HasColumnName("reaction_type");
-
-            entity.HasOne(d => d.IdAuthorNavigation).WithMany(p => p.LikesReviews)
-                .HasForeignKey(d => d.IdAuthor)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_LikesReviews_Users");
-
-            entity.HasOne(d => d.IdReviewNavigation).WithMany(p => p.LikesReviews)
-                .HasForeignKey(d => d.IdReview)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK_LikesReviews_BookReviews");
         });
 
         modelBuilder.Entity<Log>(entity =>

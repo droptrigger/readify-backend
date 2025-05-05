@@ -9,32 +9,10 @@ namespace ServerLibrary.Services.Implementations
     public class ReviewService : IReviewService
     {
         private readonly IBookReviewRepository _bookReviewRepository;
-        private readonly ILikesReviewsRepository _likesReviewRepository;
 
-        public ReviewService(IBookReviewRepository bookReviewRepository, ILikesReviewsRepository likesReviewsRepository)
+        public ReviewService(IBookReviewRepository bookReviewRepository)
         { 
             _bookReviewRepository = bookReviewRepository;
-            _likesReviewRepository = likesReviewsRepository;
-        }
-
-        public async Task<GeneralResponce> AddLikeAsync(AddLikeReviewDTO addLike)
-        {
-            if (addLike is null) throw new NullReferenceException("Model is empty");
-
-            var findReview = await _likesReviewRepository.GetLikeByAuthorIdAndReviewIdAsync(addLike.IdAuthor, addLike.IdReview);
-            if (findReview is not null) throw new Exception("Error: You have already left a like for this review.");
-
-             LikesReview like = new LikesReview()
-             {
-                 IdAuthor = addLike.IdAuthor,
-                 IdReview = addLike.IdReview,
-                 ReactionType = addLike.ReactionType,
-                 CreatedAt = DateTime.UtcNow
-             };
-
-            var addedLike = await _likesReviewRepository.AddToDatabaseAsync(like);
-
-            return new GeneralResponce("Success");
         }
 
         public async Task<GeneralResponce> AddReviewAsync(AddReviewDTO addReview)
@@ -58,15 +36,6 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task<GeneralResponce> DeleteLikeAsync(int idLike)
-        {
-            var like = await _likesReviewRepository.GetLikesReviewByIdAsync(idLike);
-            if (like is null) throw new Exception("Don't found");
-
-            await _likesReviewRepository.DeleteLikeReviewAsync(like);
-            return new GeneralResponce("Success");
-        }
-
         public async Task<GeneralResponce> DeleteReviewAsync(int id)
         {
             var findReview = await _bookReviewRepository.FindByIdAsync(id);
@@ -76,12 +45,6 @@ namespace ServerLibrary.Services.Implementations
             return new GeneralResponce("Success");
         }
 
-        public async Task<LikesReview> GetLikeAsync(int idLike)
-        {
-            var result = await _likesReviewRepository.GetLikesReviewByIdAsync(idLike);
-            if (result is null) throw new Exception("Don't found");
-            return result;
-        }
 
         public async Task<BookReview> GetReviewAsync(int id)
         {
@@ -89,14 +52,6 @@ namespace ServerLibrary.Services.Implementations
             if (findReview is null) throw new Exception("Don't found");
 
             return findReview;
-        }
-
-        public async Task<GeneralResponce> UpdateLikeAsync(UpdateLikeReviewDTO updateLike)
-        {
-            if (updateLike is null) throw new NullReferenceException("Model is empty");
-
-            await _likesReviewRepository.UpdateLikeReviewAsync(updateLike);
-            return new GeneralResponce("Success");
         }
 
         public async Task<GeneralResponce> UpdateReviewAsync(UpdateReviewDTO updateReview)

@@ -28,10 +28,5 @@ namespace HelpLibrary.DTOs.Library
         /// Страница, на которой было остановлено чтение
         /// </summary>
         public int ProgressPage { get; set; }
-
-        /// <summary>
-        /// Закладки книги
-        /// </summary>
-        public List<BookmarkDTO>? Bookmarks { get; set; }
     }
 }

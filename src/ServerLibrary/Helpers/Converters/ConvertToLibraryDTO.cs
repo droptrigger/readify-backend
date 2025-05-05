@@ -25,7 +25,6 @@ namespace ServerLibrary.Helpers.Converters
                 Book = await ConvertToSeeBookDTO.Convert(library.IdBookNavigation),
                 CreatedAt = library.CreatedAt,
                 ProgressPage = library.ProgressPage,
-                Bookmarks = library.Bookmarks?.Select(ConvertToBookmarkDTO.Convert).ToList()
             };
         }
     }

@@ -33,30 +33,11 @@ namespace ServerLibrary.Helpers.Converters.Libraries
 
         private static SeeLibraryBookDTO GetLastBook(List<Library> libraries)
         {
-            // 1. Собрать все связанные UpdatesLibraries
-            var allUpdates = libraries
-                .SelectMany(l => l.UpdatesLibrary)
-                .Where(u => u.Action == "read_page") // Фильтр по релевантным действиям
-                .ToList();
+            var fallback = libraries
+                .OrderByDescending(l => l.CreatedAt)
+                .FirstOrDefault();
 
-            // 2. Проверка наличия записей
-            if (!allUpdates.Any())
-            {
-                // Вариант 1: Вернуть последнюю книгу по CreatedAt из Library, если нет действий
-                var fallback = libraries
-                    .OrderByDescending(l => l.CreatedAt)
-                    .FirstOrDefault();
-
-                return fallback != null ? ConvertToBookDTO(fallback) : null;
-            }
-
-            // 3. Найти последнее действие
-            var lastUpdate = allUpdates
-                .OrderByDescending(u => u.CreatedAt)
-                .First();
-
-            // 4. Получить связанную книгу
-            return ConvertToBookDTO(lastUpdate.IdLibraryNavigation);
+            return fallback != null ? ConvertToBookDTO(fallback) : null;
         }
 
         private static List<GenreDTO> GetUniqueGenres(List<Library> libraries)

@@ -34,10 +34,5 @@ namespace HelpLibrary.DTOs.Reviews
         /// Дата написания отзыва
         /// </summary>
         public DateTime? CreatedAt { get; set; }
-
-        /// <summary>
-        /// Список лайков отзыва
-        /// </summary>
-        public List<LikeDTO>? Likes { get; set; }
     }
 }

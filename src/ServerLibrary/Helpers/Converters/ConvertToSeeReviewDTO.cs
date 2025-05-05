@@ -19,7 +19,6 @@ namespace ServerLibrary.Helpers.Converters
                 Rating = review.Rating,
                 CreatedAt = review.CreatedAt,
                 Author = await ConvertToAuthorDTO.Convert(review.IdAuthorNavigation),
-                Likes = review.LikesReviews?.Select(ConvertToLikeDTO.Convert).ToList()
             };
         }
     }

@@ -15,10 +15,5 @@ namespace ServerLibrary.Services.Interfaces
         Task<GeneralResponce> DeleteBookFromLibraryAsync(AddLibraryDTO library);
         Task<GeneralResponce> UpdateProgressPagesAsync(UpdateProgressDTO update);
         Task<SeeLibrariesDTO> GetAllBooksUserAsync(int id);
-
-        Task<GeneralResponce> AddBokmarkAsync(AddBookmarkDTO addBookmark);
-        Task<List<Bookmark>> GetAllBookmarksLibraryAsync(int idLibrary);
-        Task<GeneralResponce> UpdateBookmarkAsync(UpdateBookmarkDTO update);
-        Task<GeneralResponce> DeleteBookmarkAsync(int idBookmark);
     }
 }
