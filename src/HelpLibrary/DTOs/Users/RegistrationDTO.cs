@@ -6,7 +6,6 @@ namespace HelpLibrary.DTOs.Users
     {
         [MinLength(5, ErrorMessage = "Минимальное количество символов: 5")]
         [MaxLength(50, ErrorMessage = "Максимальное количество символов: 50")]
-        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Используйте только английские буквы и цифры")]
         [Required]
         public string? Nickname { get; set; }
 
