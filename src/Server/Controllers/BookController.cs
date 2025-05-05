@@ -43,8 +43,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpDelete("/books")]
-        [Consumes("multipart/form-data")]
+        [HttpDelete("/api/books")]
         public async Task<IActionResult> DeleteBook([FromForm] int id)
         {
             if (id < 0) return BadRequest("Model is empty");
@@ -93,8 +92,7 @@ namespace Server.Controllers
             }
         }
 
-        [HttpPost("/books/reviews")]
-        [Consumes("multipart/form-data")]
+        [HttpPost("/api/books/reviews")]
         public async Task<IActionResult> AddReview([FromForm] AddReviewDTO review)
         {
             if (review == null) return BadRequest("Model is empty");

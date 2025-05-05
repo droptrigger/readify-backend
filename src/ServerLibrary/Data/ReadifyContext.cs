@@ -119,7 +119,7 @@ public partial class ReadifyContext : DbContext
 
             entity.HasOne(d => d.IdBookNavigation).WithMany(p => p.BookReviews)
                 .HasForeignKey(d => d.IdBook)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_BookReviews_Books1");
         });
 
@@ -192,7 +192,7 @@ public partial class ReadifyContext : DbContext
 
             entity.HasOne(d => d.IdBookNavigation).WithMany(p => p.Libraries)
                 .HasForeignKey(d => d.IdBook)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Libraries_Books");
 
             entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.Libraries)
@@ -218,7 +218,7 @@ public partial class ReadifyContext : DbContext
 
             entity.HasOne(d => d.IdReviewNavigation).WithMany(p => p.LikesReviews)
                 .HasForeignKey(d => d.IdReview)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_LikesReviews_BookReviews");
         });
 

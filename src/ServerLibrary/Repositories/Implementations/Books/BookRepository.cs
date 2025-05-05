@@ -31,10 +31,13 @@ namespace ServerLibrary.Repositories.Implementations.Books
         public async Task<Book> FindBookByIdAsync(int id) =>
             await _context.Books             
                 .Include(b => b.IdGenreNavigation)
+                .Include(b => b.IdAuthorNavigation)
                 .Include(b => b.Libraries)
                     .ThenInclude(l => l.IdUserNavigation)
                 .Include(u => u.BookReviews)
                     .ThenInclude(l => l.LikesReviews)
+                 .Include(u => u.BookReviews)
+                    .ThenInclude(l => l.IdAuthorNavigation)
                  .AsSplitQuery()
                 .FirstOrDefaultAsync(b => b.Id == id);
 

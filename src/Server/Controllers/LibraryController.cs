@@ -20,8 +20,7 @@ namespace Server.Controllers
             _libraryService = libraryService;
         }
 
-        [HttpPost("/library")]
-        [Consumes("multipart/form-data")]
+        [HttpPost("/api/library")]
         public async Task<IActionResult> AddLibrary([FromForm] AddLibraryDTO library)
         {
             if (library == null) return BadRequest("Model is empty");
@@ -37,7 +36,7 @@ namespace Server.Controllers
             }
         }
         
-        [HttpDelete("/library")]
+        [HttpDelete("/api/library")]
         public async Task<IActionResult> DeleteLibrary([FromForm] AddLibraryDTO library)
         {
             if (library == null) return BadRequest("Model is empty");
@@ -53,8 +52,7 @@ namespace Server.Controllers
             }
         }
         
-        [HttpPut("/api/library/{id}")]
-        [Consumes("multipart/form-data")]
+        [HttpPut("/api/library")]
         public async Task<IActionResult> UpdateLibrary([FromForm] UpdateProgressDTO library)
         {
             if (library == null) return BadRequest("Model is empty");
