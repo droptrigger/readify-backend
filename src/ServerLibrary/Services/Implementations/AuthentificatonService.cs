@@ -140,7 +140,6 @@ namespace ServerLibrary.Services.Implementations
                 new Claim("email", user.Email),
                 new Claim("role", Constants.Roles[user.IdRole]),
                 new Claim("device", device),
-                new Claim("is_banned", user.IsBanned.ToString())
             };
 
             var jwtToken = new JwtSecurityToken(

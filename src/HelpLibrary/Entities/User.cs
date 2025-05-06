@@ -18,8 +18,6 @@ public partial class User
 
     public int IdRole { get; set; }
 
-    public bool IsBanned { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<BookReview> BookReviews { get; set; } = new List<BookReview>();

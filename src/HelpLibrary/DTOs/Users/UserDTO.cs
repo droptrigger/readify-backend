@@ -42,11 +42,6 @@ namespace HelpLibrary.DTOs.Users
         public int? IdRole { get; set; }
 
         /// <summary>
-        /// True - если забанен
-        /// </summary>
-        public bool? IsBanned { get; set; }
-
-        /// <summary>
         /// Дата создания аккаунта
         /// </summary>
         public DateTime? CreatedAt { get; set; }

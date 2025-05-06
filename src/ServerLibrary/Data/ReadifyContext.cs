@@ -185,7 +185,6 @@ public partial class ReadifyContext : DbContext
             entity.Property(e => e.IdRole)
                 .HasDefaultValueSql("((1))")
                 .HasColumnName("id_role");
-            entity.Property(e => e.IsBanned).HasColumnName("is_banned");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");

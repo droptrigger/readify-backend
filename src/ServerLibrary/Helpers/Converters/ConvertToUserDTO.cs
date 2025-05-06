@@ -27,7 +27,6 @@ namespace ServerLibrary.Helpers.Converters
                 Name = user.Name,
                 Email = user.Email,
                 IdRole = user.IdRole,
-                IsBanned = user.IsBanned,
                 CreatedAt = user.CreatedAt,
                 AvatarImage = await GetBytes.GetArrayAsync(Constants.PathToUserAvatarForBytes + user.AvatarImagePath),
                 Books = (await Task.WhenAll(user.Libraries.Select(ConvertToLibraryDTO.Convert)))
